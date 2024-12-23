@@ -3,7 +3,7 @@ import { pool } from "@/libs/mysql";
 
 export async function GET() {
   try {
-    const results = await pool.query("SELECT * FROM inventario_material");
+    const results = await pool.query("SELECT * FROM EMPLEADOS");
     console.log(results);
     return NextResponse.json({ message: results });
   } catch (error) {
@@ -19,32 +19,33 @@ export async function POST(request) {
   // request nos ayudara a obtener un formato json
   try {
     const {
+      rut,
       nombre,
-      descripcion,
-      categoria,
-      cantidad,
-      unidad_medida,
-      precio_unitario,
+      apellido_paterno,
+      apellido_materno,
+      area_trabajo,
+      cargo,
     } = await request.json();
-    // console.log(data);
 
-    const results = await pool.query("INSERT INTO inventario_material SET ?", {
+    const results = await pool.query("INSERT INTO EMPLEADOS SET ?", {
+      rut,
       nombre,
-      descripcion,
-      categoria,
-      cantidad,
-      unidad_medida,
-      precio_unitario,
+      apellido_paterno,
+      apellido_materno,
+      area_trabajo,
+      cargo,
     });
 
     console.log(results);
 
     return NextResponse.json({
       id: results.insertId,
+      rut,
       nombre,
-      categoria,
-      cantidad,
-      precio_unitario,
+      apellido_paterno,
+      apellido_materno,
+      area_trabajo,
+      cargo,
     });
   } catch (error) {
     console.log(error);
