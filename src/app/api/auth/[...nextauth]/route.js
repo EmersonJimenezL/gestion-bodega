@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { query } from "../../../../lib/db"; // Ajusta la ruta según tu estructura de carpetas
+import { query } from "../../../../libs/mysql"; // Ajusta la ruta según tu estructura de carpetas
 
 const authOptions = {
   providers: [

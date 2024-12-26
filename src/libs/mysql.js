@@ -10,3 +10,13 @@ export const pool = mysql({
     database: "gestionbodega",
   },
 });
+
+export async function query(sql, values) {
+  try {
+    const results = await pool.query(sql, values);
+    await pool.end();
+    return results;
+  } catch (e) {
+    throw Error(e.message);
+  }
+}
