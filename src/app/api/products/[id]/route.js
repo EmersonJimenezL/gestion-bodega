@@ -41,20 +41,40 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    const results = await pool.query(
-      "DELETE FROM INVENTARIO_MATERIAL WHERE ID = ?",
+    // Verificar si el producto existe antes de intentar eliminarlo
+    const checkResult = await pool.query(
+      "SELECT * FROM INVENTARIO_MATERIAL WHERE ID = ?",
       [id]
     );
 
-    if (results.affectedRows === 0) {
+    if (checkResult.length === 0) {
       return NextResponse.json(
         { message: "Producto no encontrado" },
         { status: 404 }
       );
     }
 
+    // Proceder a eliminar el producto
+    const results = await pool.query(
+      "DELETE FROM INVENTARIO_MATERIAL WHERE ID = ?",
+      [id]
+    );
+
+    // Agregar más depuración para verificar los resultados de la eliminación
+    console.log("Resultados de DELETE:", results);
+
+    // Verificar si se eliminó algún producto
+    if (results.affectedRows === 0) {
+      return NextResponse.json(
+        { message: "No se pudo eliminar el producto." },
+        { status: 500 }
+      );
+    }
+
+    // Confirmación de eliminación exitosa
     return NextResponse.json(null, { status: 204 });
   } catch (error) {
+    console.error("Error al eliminar el producto:", error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }

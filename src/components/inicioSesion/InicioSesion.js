@@ -1,6 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Box,
+  Paper,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -9,12 +16,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      // Código que depende del cliente
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,12 +37,37 @@ const Login = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 8 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Iniciar Sesión
-        </Typography>
-        {error && <Typography color="error">{error}</Typography>}
+    <Container
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+      }}
+    >
+      <Paper
+        elevation={4}
+        sx={{
+          padding: 4,
+          borderRadius: 4,
+          backgroundColor: "#f9f9f9",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <Box sx={{ textAlign: "center", mb: 3 }}>
+          <Typography variant="h4" component="h1" color="primary" gutterBottom>
+            Bienvenido
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
+            Inicia sesión para continuar
+          </Typography>
+        </Box>
+        {error && (
+          <Typography color="error" sx={{ mb: 2 }}>
+            {error}
+          </Typography>
+        )}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Usuario"
@@ -60,11 +86,28 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button type="submit" variant="contained" color="primary" fullWidth>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2, py: 1.5, fontWeight: "bold", textTransform: "none" }}
+          >
             Ingresar
           </Button>
         </form>
-      </Box>
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          align="center"
+          sx={{ mt: 2 }}
+        >
+          ¿Olvidaste tu contraseña?{" "}
+          <a href="#" style={{ color: "#1976d2", textDecoration: "none" }}>
+            Recupérala aquí
+          </a>
+        </Typography>
+      </Paper>
     </Container>
   );
 };

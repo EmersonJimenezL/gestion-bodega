@@ -1,9 +1,13 @@
+"use client";
+
 import InicioSesion from "../../components/inicioSesion/InicioSesion";
 
-export default function inicioSesion() {
+function inicioSesion() {
   return (
     <div>
       <InicioSesion />
     </div>
   );
 }
+
+export default inicioSesion;
