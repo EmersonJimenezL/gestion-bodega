@@ -12,9 +12,12 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.2.1",
+    "axios": "^1.7.9",
     "dotenv": "^16.4.7",
+    "mysql": "^2.18.1",
     "mysql2": "^3.11.5",
     "next": "15.1.2",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "serverless-mysql": "^1.5.5"
