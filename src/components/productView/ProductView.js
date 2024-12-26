@@ -39,14 +39,30 @@ export default function ProductView() {
 
   const handleDelete = async (id) => {
     console.log(`Eliminar producto con ID: ${id}`);
-    // Aquí puedes agregar la lógica para eliminar el producto
     try {
-      await axios.delete(`http://localhost:3000/api/products/${id}`);
-      setProducts((prevProducts) =>
-        prevProducts.filter((product) => product.id !== id)
+      const response = await axios.delete(
+        `http://localhost:3000/api/products/${id}`
       );
+      console.log("Producto eliminado:", response.data);
+
+      // Recargar los productos después de eliminar uno
+      const { data } = await axios.get("http://localhost:3000/api/products");
+      setProducts(data.message);
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
+      if (error.response) {
+        // Si la respuesta está disponible, muestra más detalles
+        console.error("Detalles del error:", error.response.data);
+        console.error("Estado del error:", error.response.status);
+        console.error("Encabezados de la respuesta:", error.response.headers);
+      } else if (error.request) {
+        console.error("No se recibió respuesta del servidor", error.request);
+      } else {
+        console.error(
+          "Error en la configuración de la solicitud",
+          error.message
+        );
+      }
     }
   };
 

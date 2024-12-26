@@ -32,9 +32,11 @@ export async function GET(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    // Validar que params.id sea un número
-    const id = parseInt(params.id, 10);
-    if (isNaN(id)) {
+    const { id } = params; // Asegúrate de que params.id esté bien resuelto
+
+    // Validar que id sea un número
+    const productId = parseInt(id, 10);
+    if (isNaN(productId)) {
       return NextResponse.json(
         { message: "ID inválido. Debe ser un número." },
         { status: 400 }
@@ -44,7 +46,7 @@ export async function DELETE(request, { params }) {
     // Verificar si el producto existe antes de intentar eliminarlo
     const checkResult = await pool.query(
       "SELECT * FROM INVENTARIO_MATERIAL WHERE ID = ?",
-      [id]
+      [productId]
     );
 
     if (checkResult.length === 0) {
@@ -54,16 +56,18 @@ export async function DELETE(request, { params }) {
       );
     }
 
+    // Eliminar las referencias primero en la tabla relacionada (si las hay)
+    await pool.query("DELETE FROM retiros_material WHERE id_material = ?", [
+      productId,
+    ]);
+
     // Proceder a eliminar el producto
     const results = await pool.query(
       "DELETE FROM INVENTARIO_MATERIAL WHERE ID = ?",
-      [id]
+      [productId]
     );
 
-    // Agregar más depuración para verificar los resultados de la eliminación
-    console.log("Resultados de DELETE:", results);
-
-    // Verificar si se eliminó algún producto
+    // Verificar si se eliminó el producto
     if (results.affectedRows === 0) {
       return NextResponse.json(
         { message: "No se pudo eliminar el producto." },
@@ -72,7 +76,10 @@ export async function DELETE(request, { params }) {
     }
 
     // Confirmación de eliminación exitosa
-    return NextResponse.json(null, { status: 204 });
+    return NextResponse.json(
+      { message: "Producto eliminado exitosamente." },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error al eliminar el producto:", error);
     return NextResponse.json({ message: error.message }, { status: 500 });
