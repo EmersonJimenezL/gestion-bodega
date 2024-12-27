@@ -3,7 +3,6 @@ import { pool } from "@/libs/mysql";
 
 export async function GET(request, { params }) {
   try {
-    // Validar que params.id sea un número
     const id = parseInt(params.id, 10);
     if (isNaN(id)) {
       return NextResponse.json(
@@ -26,15 +25,18 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(results[0]);
   } catch (error) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    console.error("Error al obtener el producto:", error);
+    return NextResponse.json(
+      { message: "Ocurrió un error al procesar la solicitud." },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params; // Asegúrate de que params.id esté bien resuelto
+    const { id } = params;
 
-    // Validar que id sea un número
     const productId = parseInt(id, 10);
     if (isNaN(productId)) {
       return NextResponse.json(
@@ -67,7 +69,6 @@ export async function DELETE(request, { params }) {
       [productId]
     );
 
-    // Verificar si se eliminó el producto
     if (results.affectedRows === 0) {
       return NextResponse.json(
         { message: "No se pudo eliminar el producto." },
@@ -75,20 +76,21 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Confirmación de eliminación exitosa
     return NextResponse.json(
       { message: "Producto eliminado exitosamente." },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error al eliminar el producto:", error);
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Ocurrió un error al procesar la solicitud." },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request, { params }) {
   try {
-    // Validar que params.id sea un número
     const id = parseInt(params.id, 10);
     if (isNaN(id)) {
       return NextResponse.json(
@@ -99,7 +101,6 @@ export async function PUT(request, { params }) {
 
     const data = await request.json();
 
-    // Validar campos en el objeto `data`
     const {
       nombre,
       descripcion,
@@ -108,6 +109,7 @@ export async function PUT(request, { params }) {
       unidad_medida,
       precio_unitario,
     } = data;
+
     if (
       !nombre ||
       !categoria ||
@@ -128,25 +130,46 @@ export async function PUT(request, { params }) {
       );
     }
 
-    const results = await pool.query(
-      "UPDATE inventario_material SET ? WHERE ID = ?",
-      [data, id]
-    );
+    const query = `
+      UPDATE inventario_material
+      SET nombre = ?, descripcion = ?, categoria = ?, cantidad = ?, unidad_medida = ?, precio_unitario = ?
+      WHERE ID = ?
+    `;
+    const results = await pool.query(query, [
+      nombre,
+      descripcion,
+      categoria,
+      cantidad,
+      unidad_medida,
+      precio_unitario,
+      id,
+    ]);
 
     if (results.affectedRows === 0) {
       return NextResponse.json(
-        { message: "Producto no encontrado" },
+        { message: "Producto no encontrado o no se realizaron cambios." },
         { status: 404 }
       );
     }
 
     const updatedProduct = await pool.query(
-      "SELECT * FROM INVENTARIO_MATERIAL WHERE ID = ?",
+      "SELECT * FROM inventario_material WHERE ID = ?",
       [id]
     );
 
+    if (updatedProduct.length === 0) {
+      return NextResponse.json(
+        { message: "No se pudo recuperar el producto actualizado." },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(updatedProduct[0]);
   } catch (error) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    console.error("Error al actualizar el producto:", error);
+    return NextResponse.json(
+      { message: "Ocurrió un error al procesar la solicitud." },
+      { status: 500 }
+    );
   }
 }

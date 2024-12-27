@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+"use client";
+import { useState, useRef, useEffect } from "react";
 import {
   TextField,
   Container,
@@ -12,7 +13,7 @@ import {
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-export default function ProductForm() {
+export default function ProductoForm() {
   const [producto, setProducto] = useState({
     nombre: "",
     descripcion: "",
@@ -21,63 +22,47 @@ export default function ProductForm() {
     unidad_medida: "",
     precio_unitario: 0,
   });
-  const [errors, setErrors] = useState({});
-  const router = useRouter();
   const form = useRef(null);
 
   const categoriasValidas = ["Herramienta", "Consumible"];
-  const unidadesValidas = ["pieza", "kilogramo", "litro", "metro"];
+  const unidadesValidas = ["pieza", "kilogramo", "litro", "metro"]; // Agrega las unidades de medida válidas aquí
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setProducto({
       ...producto,
       [name]:
         name === "cantidad" || name === "precio_unitario"
-          ? Number(value)
-          : value,
+          ? Number(value) // Convertir a número
+          : value, // Mantener como texto para los demás
     });
-  };
-
-  const validate = () => {
-    let tempErrors = {};
-    if (!producto.nombre) tempErrors.nombre = "Este campo es obligatorio.";
-    if (!producto.descripcion)
-      tempErrors.descripcion = "Este campo es obligatorio.";
-    if (!producto.categoria)
-      tempErrors.categoria = "Este campo es obligatorio.";
-    if (!producto.cantidad) tempErrors.cantidad = "Este campo es obligatorio.";
-    if (!producto.unidad_medida)
-      tempErrors.unidad_medida = "Este campo es obligatorio.";
-    if (!producto.precio_unitario)
-      tempErrors.precio_unitario = "Este campo es obligatorio.";
-
-    if (!categoriasValidas.includes(producto.categoria)) {
-      tempErrors.categoria = "La categoría seleccionada no es válida.";
-    }
-
-    if (!unidadesValidas.includes(producto.unidad_medida)) {
-      tempErrors.unidad_medida =
-        "La unidad de medida seleccionada no es válida.";
-    }
-
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validate()) {
-      try {
-        const res = await axios.post("/api/products/", producto);
-        console.log(res);
+    // Validación en el cliente
+    if (!categoriasValidas.includes(producto.categoria)) {
+      alert("La categoría seleccionada no es válida.");
+      return;
+    }
 
-        form.current.reset();
-        router.push("/vista-producto");
-      } catch (error) {
-        console.error("Error al guardar el producto:", error);
-      }
+    if (!unidadesValidas.includes(producto.unidad_medida)) {
+      alert("La unidad de medida seleccionada no es válida.");
+      return;
+    }
+
+    try {
+      const res = await axios.post("/api/products/", producto);
+      console.log(res);
+
+      router.push("/vista-producto");
+
+      form.current.reset();
+    } catch (error) {
+      console.error("Error al guardar el producto:", error);
     }
   };
 
@@ -117,12 +102,11 @@ export default function ProductForm() {
 
         <TextField
           fullWidth
-          label="Nombre de producto *"
+          label="Nombre de producto"
           variant="outlined"
           name="nombre"
+          value={producto.nombre}
           onChange={handleChange}
-          error={!!errors.nombre}
-          helperText={errors.nombre}
           style={{
             backgroundColor: "white",
             borderRadius: 1,
@@ -130,26 +114,24 @@ export default function ProductForm() {
         />
         <TextField
           fullWidth
-          label="Descripción *"
+          label="Descripción"
           variant="outlined"
           name="descripcion"
           onChange={handleChange}
           multiline
           rows={4}
-          error={!!errors.descripcion}
-          helperText={errors.descripcion}
           style={{
             backgroundColor: "white",
             borderRadius: 1,
           }}
         />
 
+        {/* Selector de categoría */}
         <FormControl
           fullWidth
-          error={!!errors.categoria}
           style={{ backgroundColor: "white", borderRadius: 1 }}
         >
-          <InputLabel id="categoria-label">Categoría *</InputLabel>
+          <InputLabel id="categoria-label">Categoría</InputLabel>
           <Select
             labelId="categoria-label"
             name="categoria"
@@ -163,39 +145,34 @@ export default function ProductForm() {
               </MenuItem>
             ))}
           </Select>
-          <Typography variant="body2" color="error">
-            {errors.categoria}
-          </Typography>
         </FormControl>
 
         <TextField
           fullWidth
-          label="Cantidad *"
+          label="Cantidad"
           type="number"
           variant="outlined"
           name="cantidad"
           onChange={handleChange}
-          error={!!errors.cantidad}
-          helperText={errors.cantidad}
           style={{
             backgroundColor: "white",
             borderRadius: 1,
           }}
         />
 
+        {/* Selector de unidad de medida */}
         <FormControl
           fullWidth
-          error={!!errors.unidad_medida}
           style={{ backgroundColor: "white", borderRadius: 1 }}
         >
-          <InputLabel id="unidad-medida-label">Unidad de medida *</InputLabel>
+          <InputLabel id="unidad-medida-label">Unidad de medida</InputLabel>
           <Select
             labelId="unidad-medida-label"
             name="unidad_medida"
             value={producto.unidad_medida}
             onChange={handleChange}
             variant="outlined"
-            defaultValue=""
+            defaultValue="Unidad de medida"
           >
             {unidadesValidas.map((unidad) => (
               <MenuItem key={unidad} value={unidad}>
@@ -203,20 +180,15 @@ export default function ProductForm() {
               </MenuItem>
             ))}
           </Select>
-          <Typography variant="body2" color="error">
-            {errors.unidad_medida}
-          </Typography>
         </FormControl>
 
         <TextField
           fullWidth
-          label="Precio Unitario *"
+          label="Precio Unitario"
           type="number"
           variant="outlined"
           name="precio_unitario"
           onChange={handleChange}
-          error={!!errors.precio_unitario}
-          helperText={errors.precio_unitario}
           style={{
             backgroundColor: "white",
             borderRadius: 1,

@@ -10,18 +10,20 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
 import { Box, Typography, Button } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 export default function ProductView() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
 
     async function cargarProductos() {
       try {
-        const { data } = await axios.get("http://localhost:3000/api/products");
+        const { data } = await axios.get("/api/products/"); // Usar ruta relativa
         setProducts(data.message);
       } catch (error) {
         console.error("Error al cargar los productos:", error);
@@ -33,36 +35,16 @@ export default function ProductView() {
   }, []);
 
   const handleUpdate = (id) => {
-    console.log(`Actualizar producto con ID: ${id}`);
-    // Aquí puedes agregar la lógica para redirigir a un formulario de actualización
+    // Redirigir al formulario de registro con el id del producto
+    router.push(`/registro-producto?id=${id}`);
   };
 
-  const handleDelete = async (id) => {
-    console.log(`Eliminar producto con ID: ${id}`);
-    try {
-      const response = await axios.delete(
-        `http://localhost:3000/api/products/${id}`
-      );
-      console.log("Producto eliminado:", response.data);
-
-      // Recargar los productos después de eliminar uno
-      const { data } = await axios.get("http://localhost:3000/api/products");
-      setProducts(data.message);
-    } catch (error) {
-      console.error("Error al eliminar el producto:", error);
-      if (error.response) {
-        // Si la respuesta está disponible, muestra más detalles
-        console.error("Detalles del error:", error.response.data);
-        console.error("Estado del error:", error.response.status);
-        console.error("Encabezados de la respuesta:", error.response.headers);
-      } else if (error.request) {
-        console.error("No se recibió respuesta del servidor", error.request);
-      } else {
-        console.error(
-          "Error en la configuración de la solicitud",
-          error.message
-        );
-      }
+  const handleDelete = async (productId) => {
+    if (confirm("Are you sure?")) {
+      // Realizamos la eliminación y esperamos a que se complete
+      const res = await axios.delete("/api/products/" + productId);
+      // Recargamos la página para reflejar los cambios
+      window.location.reload();
     }
   };
 
