@@ -4,7 +4,7 @@ import { pool } from "@/libs/mysql";
 export async function GET() {
   try {
     const results = await pool.query("SELECT * FROM EMPLEADOS");
-    return NextResponse.json({ message: results });
+    return NextResponse.json({ empleados: results });
   } catch (error) {
     console.error("Error al conectar con la base de datos:", error);
     return NextResponse.json(
@@ -82,7 +82,7 @@ export async function POST(request) {
       cargo,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error en la solicitud POST:", error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }

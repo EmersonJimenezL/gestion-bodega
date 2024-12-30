@@ -1,134 +1,159 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import { useState, useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Box,
+  Typography,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
 import axios from "axios";
-import { Box, Typography } from "@mui/material";
 
-export default function ProductView() {
+export default function TrabajadoresView() {
   const [trabajadores, setTrabajadores] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isClient, setIsClient] = useState(false); // Nuevo estado para verificar si es cliente
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // Marca cuando se monta el componente en el cliente
     setIsClient(true);
 
-    // Función para cargar los productos
-    async function cargarTrabajadores() {
+    const cargarTrabajadores = async () => {
       try {
-        const { data } = await axios.get(
-          "http://localhost:3000/api/trabajadores"
-        );
-        setTrabajadores(data.message); // Suponiendo que la respuesta es 'data.message'
+        const { data } = await axios.get("/api/trabajadores");
+        setTrabajadores(data.empleados);
       } catch (error) {
-        console.error("Error al cargar los productos:", error);
+        console.error("Error al cargar los trabajadores:", error);
       } finally {
-        setIsLoading(false); // Finaliza la carga de datos
+        setIsLoading(false);
       }
-    }
+    };
     cargarTrabajadores();
   }, []);
 
-  // Condición para asegurarnos de que solo se renderiza en el cliente
+  const handleUpdate = (id) => {
+    router.push(`/registro-trabajador?id=${id}`);
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm("¿Estás seguro de eliminar este trabajador?")) {
+      try {
+        await axios.delete(`/api/trabajadores/${id}`);
+        setTrabajadores(
+          trabajadores.filter((trabajador) => trabajador.id !== id)
+        );
+      } catch (error) {
+        console.error("Error al eliminar trabajador:", error);
+      }
+    }
+  };
+
+  const handleBack = () => {
+    router.back(); // Ruta para volver a la pagina anterior
+  };
+
+  const handleInventoriView = () => {
+    router.push("/vista-producto");
+  };
+
+  const handleRegisterWorker = () => {
+    router.push("/registro-trabajador");
+  };
+
   if (!isClient) {
-    return null; // No renderizar nada hasta que el componente se haya montado
+    return null;
   }
 
-  // Mostrar mensaje de carga mientras los productos están siendo cargados
   if (isLoading) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="h6">Cargando productos...</Typography>
+        <Typography variant="h6" sx={{ color: "#fff" }}>
+          Cargando trabajadores...
+        </Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box
+      sx={{
+        p: 4,
+        backgroundColor: "#1a202c", // Fondo oscuro
+        minHeight: "100vh",
+        color: "#fff",
+      }}
+    >
       <Typography
-        variant="h5"
+        variant="h4"
         sx={{
-          mb: 2,
+          mb: 4,
           textAlign: "center",
-          fontSize: { xs: "18px", md: "24px" },
+          fontSize: { xs: "20px", md: "28px" },
+          fontWeight: "bold",
         }}
       >
-        Lista de trabajadores
+        Gestión de trabajadores
       </Typography>
+      <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mb: 4 }}>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleBack}
+        >
+          Volver
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleInventoriView}
+        >
+          Inventario
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleRegisterWorker}
+        >
+          Registro de trabajador
+        </Button>
+      </Box>
       <TableContainer
         component={Paper}
         sx={{
           borderRadius: "8px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.3)",
           overflowX: "auto",
-          maxWidth: "100%", // Asegura que la tabla no exceda el ancho del contenedor
+          backgroundColor: "#2d3748", // Color de fondo oscuro para la tabla
         }}
       >
         <Table
           sx={{
             minWidth: 650,
-            "& th, & td": { whiteSpace: "nowrap" }, // Para evitar que el texto se desborde
+            "& th": { color: "#e2e8f0", fontWeight: "bold" },
+            "& td": { color: "#cbd5e0" },
           }}
           size="small"
           aria-label="responsive table"
         >
           <TableHead>
-            <TableRow sx={{ backgroundColor: "#1a202c" }}>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                ID
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                RUT
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                NOMBRE
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                APELLIDO PATERNO
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                APELLIDO MATERNO
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                AREA DE TRABAJO
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                CARGO
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                FECHA DE REGISTRO
-              </TableCell>
+            <TableRow>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">RUT</TableCell>
+              <TableCell align="center">Nombre</TableCell>
+              <TableCell align="center">Apellido Paterno</TableCell>
+              <TableCell align="center">Apellido Materno</TableCell>
+              <TableCell align="center">Área de Trabajo</TableCell>
+              <TableCell align="center">Cargo</TableCell>
+              <TableCell align="center">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -136,13 +161,15 @@ export default function ProductView() {
               <TableRow
                 key={trabajador.id}
                 sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  backgroundColor: "#f8f9fa",
+                  "&:nth-of-type(odd)": {
+                    backgroundColor: "#2a2f3a", // Alternar colores en filas
+                  },
+                  "&:nth-of-type(even)": {
+                    backgroundColor: "#1f2733",
+                  },
                 }}
               >
-                <TableCell component="th" scope="row" align="center">
-                  {trabajador.id}
-                </TableCell>
+                <TableCell align="center">{trabajador.id}</TableCell>
                 <TableCell align="center">{trabajador.rut}</TableCell>
                 <TableCell align="center">{trabajador.nombre}</TableCell>
                 <TableCell align="center">
@@ -154,7 +181,23 @@ export default function ProductView() {
                 <TableCell align="center">{trabajador.area_trabajo}</TableCell>
                 <TableCell align="center">{trabajador.cargo}</TableCell>
                 <TableCell align="center">
-                  {trabajador.fecha_registro}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    sx={{ mr: 1 }}
+                    onClick={() => handleUpdate(trabajador.id)}
+                  >
+                    Actualizar
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    onClick={() => handleDelete(trabajador.id)}
+                  >
+                    Eliminar
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

@@ -9,6 +9,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Grid,
 } from "@mui/material";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,7 +35,6 @@ export default function ProductoForm() {
   useEffect(() => {
     if (id) {
       setIsEditing(true);
-      // Cargar los datos del producto
       const cargarProducto = async () => {
         try {
           const { data } = await axios.get(`/api/products/${id}`);
@@ -61,7 +61,6 @@ export default function ProductoForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación en el cliente
     if (!categoriasValidas.includes(producto.categoria)) {
       alert("La categoría seleccionada no es válida.");
       return;
@@ -74,11 +73,9 @@ export default function ProductoForm() {
 
     try {
       if (isEditing) {
-        // Actualizar producto
         await axios.put(`/api/products/${id}`, producto);
         alert("Producto actualizado correctamente");
       } else {
-        // Crear nuevo producto
         await axios.post("/api/products/", producto);
         alert("Producto registrado correctamente");
       }
@@ -98,7 +95,7 @@ export default function ProductoForm() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#e0e0e0",
+        backgroundColor: "#1b1b1b",
         padding: 2,
       }}
     >
@@ -110,19 +107,22 @@ export default function ProductoForm() {
           alignItems: "center",
           gap: 15,
           padding: 30,
-          backgroundColor: "#f5f5f5",
+          backgroundColor: "#242424",
           borderRadius: 20,
-          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.5)",
         }}
       >
         <Typography
           variant="h5"
           component="h1"
-          style={{ fontWeight: "bold", color: "#333" }}
+          style={{
+            fontWeight: "bold",
+            color: "#f5f5f5",
+            fontFamily: "Roboto, sans-serif",
+          }}
         >
           {isEditing ? "Editar Producto" : "Registro de Producto"}
         </Typography>
-
         <TextField
           fullWidth
           label="Nombre de producto"
@@ -131,8 +131,12 @@ export default function ProductoForm() {
           value={producto.nombre}
           onChange={handleChange}
           style={{
-            backgroundColor: "white",
-            borderRadius: 1,
+            backgroundColor: "#333",
+            borderRadius: 5,
+            color: "#fff",
+          }}
+          InputProps={{
+            style: { color: "#fff" },
           }}
         />
         <TextField
@@ -144,23 +148,31 @@ export default function ProductoForm() {
           multiline
           rows={4}
           style={{
-            backgroundColor: "white",
-            borderRadius: 1,
+            backgroundColor: "#333",
+            borderRadius: 5,
+            color: "#fff",
+          }}
+          InputProps={{
+            style: { color: "#fff" },
           }}
         />
-
-        {/* Selector de categoría */}
         <FormControl
           fullWidth
-          style={{ backgroundColor: "white", borderRadius: 1 }}
+          style={{
+            backgroundColor: "#333",
+            borderRadius: 5,
+          }}
         >
-          <InputLabel id="categoria-label">Categoría</InputLabel>
+          <InputLabel id="categoria-label" style={{ color: "#fff" }}>
+            Categoría
+          </InputLabel>
           <Select
             labelId="categoria-label"
             name="categoria"
             value={producto.categoria}
             onChange={handleChange}
             variant="outlined"
+            style={{ color: "#fff" }}
           >
             {categoriasValidas.map((categoria) => (
               <MenuItem key={categoria} value={categoria}>
@@ -169,7 +181,6 @@ export default function ProductoForm() {
             ))}
           </Select>
         </FormControl>
-
         <TextField
           fullWidth
           label="Cantidad"
@@ -178,24 +189,31 @@ export default function ProductoForm() {
           name="cantidad"
           onChange={handleChange}
           style={{
-            backgroundColor: "white",
-            borderRadius: 1,
+            backgroundColor: "#333",
+            borderRadius: 5,
+            color: "#fff",
+          }}
+          InputProps={{
+            style: { color: "#fff" },
           }}
         />
-
-        {/* Selector de unidad de medida */}
         <FormControl
           fullWidth
-          style={{ backgroundColor: "white", borderRadius: 1 }}
+          style={{
+            backgroundColor: "#333",
+            borderRadius: 5,
+          }}
         >
-          <InputLabel id="unidad-medida-label">Unidad de medida</InputLabel>
+          <InputLabel id="unidad-medida-label" style={{ color: "#fff" }}>
+            Unidad de medida
+          </InputLabel>
           <Select
             labelId="unidad-medida-label"
             name="unidad_medida"
             value={producto.unidad_medida}
             onChange={handleChange}
             variant="outlined"
-            defaultValue="Unidad de medida"
+            style={{ color: "#fff" }}
           >
             {unidadesValidas.map((unidad) => (
               <MenuItem key={unidad} value={unidad}>
@@ -204,7 +222,6 @@ export default function ProductoForm() {
             ))}
           </Select>
         </FormControl>
-
         <TextField
           fullWidth
           label="Precio Unitario"
@@ -213,26 +230,43 @@ export default function ProductoForm() {
           name="precio_unitario"
           onChange={handleChange}
           style={{
-            backgroundColor: "white",
-            borderRadius: 1,
+            backgroundColor: "#333",
+            borderRadius: 5,
+            color: "#fff",
           }}
         />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          style={{
-            backgroundColor: "#007bff",
-            "&:hover": {
-              backgroundColor: "#0056b3",
-            },
-            fontWeight: "bold",
-            fontSize: "16px",
-            padding: "10px 20px",
-          }}
-        >
-          Guardar Producto
-        </Button>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item>
+            <Button
+              type="submit"
+              variant="contained"
+              style={{
+                backgroundColor: "#007bff",
+                color: "#fff",
+                fontWeight: "bold",
+                fontSize: "16px",
+                padding: "10px 20px",
+              }}
+            >
+              Guardar
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              onClick={() => router.back()}
+              variant="outlined"
+              style={{
+                borderColor: "#007bff",
+                color: "#007bff",
+                fontWeight: "bold",
+                fontSize: "16px",
+                padding: "10px 20px",
+              }}
+            >
+              Volver
+            </Button>
+          </Grid>
+        </Grid>
       </Container>
     </form>
   );

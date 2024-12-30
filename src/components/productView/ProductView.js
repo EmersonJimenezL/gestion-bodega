@@ -23,7 +23,7 @@ export default function ProductView() {
 
     async function cargarProductos() {
       try {
-        const { data } = await axios.get("/api/products/"); // Usar ruta relativa
+        const { data } = await axios.get("/api/products/");
         setProducts(data.message);
       } catch (error) {
         console.error("Error al cargar los productos:", error);
@@ -39,12 +39,22 @@ export default function ProductView() {
   };
 
   const handleDelete = async (productId) => {
-    if (confirm("Are you sure?")) {
-      // Realizamos la eliminación y esperamos a que se complete
-      const res = await axios.delete("/api/products/" + productId);
-      // Recargamos la página para reflejar los cambios
+    if (confirm("¿Estás seguro de eliminar este producto?")) {
+      await axios.delete("/api/products/" + productId);
       window.location.reload();
     }
+  };
+
+  const handleBack = () => {
+    router.back(); // Ruta para volver a la pagina anterior
+  };
+
+  const handleWorkerView = () => {
+    router.push("/vista-trabajador");
+  };
+
+  const handleRegisterProduct = () => {
+    router.push("/registro-producto");
   };
 
   if (!isClient) {
@@ -54,90 +64,87 @@ export default function ProductView() {
   if (isLoading) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="h6">Cargando productos...</Typography>
+        <Typography variant="h6" sx={{ color: "#fff" }}>
+          Cargando productos...
+        </Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box
+      sx={{
+        p: 4,
+        backgroundColor: "#1a202c", // Fondo oscuro
+        minHeight: "100vh",
+        color: "#fff",
+      }}
+    >
       <Typography
-        variant="h5"
+        variant="h4"
         sx={{
-          mb: 2,
+          mb: 4,
           textAlign: "center",
-          fontSize: { xs: "18px", md: "24px" },
+          fontSize: { xs: "20px", md: "28px" },
+          fontWeight: "bold",
         }}
       >
-        Lista de Productos
+        Gestión de Productos
       </Typography>
+      <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mb: 4 }}>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleBack}
+        >
+          Volver
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleWorkerView}
+        >
+          Trabajadores
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleRegisterProduct}
+        >
+          Registro de producto
+        </Button>
+      </Box>
       <TableContainer
         component={Paper}
         sx={{
           borderRadius: "8px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.3)",
           overflowX: "auto",
-          maxWidth: "100%",
+          backgroundColor: "#2d3748", // Color de fondo oscuro para la tabla
         }}
       >
         <Table
           sx={{
             minWidth: 650,
-            "& th, & td": { whiteSpace: "nowrap" },
+            "& th": { color: "#e2e8f0", fontWeight: "bold" },
+            "& td": { color: "#cbd5e0" },
           }}
           size="small"
           aria-label="responsive table"
         >
           <TableHead>
-            <TableRow sx={{ backgroundColor: "#1a202c" }}>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                ID
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                Nombre
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                Descripción
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                Categoría
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                Cantidad
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                Unidad de Medida
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                Precio Unitario
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                Acciones
-              </TableCell>
+            <TableRow>
+              <TableCell align="center">ID</TableCell>
+              <TableCell align="center">Nombre</TableCell>
+              <TableCell align="center">Descripción</TableCell>
+              <TableCell align="center">Categoría</TableCell>
+              <TableCell align="center">Cantidad</TableCell>
+              <TableCell align="center">Unidad de Medida</TableCell>
+              <TableCell align="center">Precio Unitario</TableCell>
+              <TableCell align="center">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -145,13 +152,15 @@ export default function ProductView() {
               <TableRow
                 key={product.id}
                 sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  backgroundColor: "#f8f9fa",
+                  "&:nth-of-type(odd)": {
+                    backgroundColor: "#2a2f3a", // Alternar colores en filas
+                  },
+                  "&:nth-of-type(even)": {
+                    backgroundColor: "#1f2733",
+                  },
                 }}
               >
-                <TableCell component="th" scope="row" align="center">
-                  {product.id}
-                </TableCell>
+                <TableCell align="center">{product.id}</TableCell>
                 <TableCell align="center">{product.nombre}</TableCell>
                 <TableCell align="center">{product.descripcion}</TableCell>
                 <TableCell align="center">{product.categoria}</TableCell>
@@ -161,7 +170,7 @@ export default function ProductView() {
                 <TableCell align="center">
                   <Button
                     variant="contained"
-                    color="success"
+                    color="primary"
                     size="small"
                     sx={{ mr: 1 }}
                     onClick={() => handleUpdate(product.id)}
@@ -170,7 +179,7 @@ export default function ProductView() {
                   </Button>
                   <Button
                     variant="contained"
-                    color="error"
+                    color="secondary"
                     size="small"
                     onClick={() => handleDelete(product.id)}
                   >
