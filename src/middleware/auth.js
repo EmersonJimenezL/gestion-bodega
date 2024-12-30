@@ -1,21 +1,36 @@
-// src/middleware/auth.js
-"use client";
-import jwt from "jsonwebtoken";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export const authMiddleware = (req, res, next) => {
-  const token = req.headers["authorization"];
+export const useSessionTimeout = () => {
+  const router = useRouter();
 
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Acceso denegado. No se proporcionó un token." });
-  }
+  useEffect(() => {
+    const checkInactivity = () => {
+      const lastActivity = localStorage.getItem("lastActivity");
+      const now = Date.now();
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Agrega el usuario decodificado a la solicitud
-    next(); // Pasa al siguiente middleware o ruta
-  } catch (err) {
-    return res.status(403).json({ message: "Token no válido o expirado." });
-  }
+      if (lastActivity && now - parseInt(lastActivity, 10) > 30 * 60 * 1000) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("lastActivity");
+        router.push("/login");
+      }
+    };
+
+    const updateActivity = () => {
+      localStorage.setItem("lastActivity", Date.now());
+    };
+
+    // Verifica la inactividad cada minuto
+    const interval = setInterval(checkInactivity, 60 * 1000);
+
+    // Escucha eventos de actividad del usuario
+    window.addEventListener("mousemove", updateActivity);
+    window.addEventListener("keypress", updateActivity);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("mousemove", updateActivity);
+      window.removeEventListener("keypress", updateActivity);
+    };
+  }, [router]);
 };

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -17,6 +17,14 @@ const Login = () => {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  useEffect(() => {
+    // Verifica si el usuario ya tiene una sesión activa
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/vista-producto");
+    }
+  }, [router]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -30,6 +38,7 @@ const Login = () => {
         }
       );
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("lastActivity", Date.now()); // Guarda el tiempo de actividad
       router.push("/registro-producto");
     } catch (err) {
       setError("Inicio de sesión fallido. Por favor, revisa tus credenciales.");
