@@ -35,7 +35,6 @@ export default function ProductView() {
   }, []);
 
   const handleUpdate = (id) => {
-    // Redirigir al formulario de registro con el id del producto
     router.push(`/registro-producto?id=${id}`);
   };
 

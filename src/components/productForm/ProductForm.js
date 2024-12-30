@@ -11,7 +11,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ProductoForm() {
   const [producto, setProducto] = useState({
@@ -22,21 +22,39 @@ export default function ProductoForm() {
     unidad_medida: "",
     precio_unitario: 0,
   });
+  const [isEditing, setIsEditing] = useState(false);
   const form = useRef(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   const categoriasValidas = ["Herramienta", "Consumible"];
-  const unidadesValidas = ["pieza", "kilogramo", "litro", "metro"]; // Agrega las unidades de medida válidas aquí
-  const router = useRouter();
+  const unidadesValidas = ["pieza", "kilogramo", "litro", "metro"];
+
+  useEffect(() => {
+    if (id) {
+      setIsEditing(true);
+      // Cargar los datos del producto
+      const cargarProducto = async () => {
+        try {
+          const { data } = await axios.get(`/api/products/${id}`);
+          setProducto(data);
+        } catch (error) {
+          console.error("Error al cargar el producto:", error);
+        }
+      };
+      cargarProducto();
+    }
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setProducto({
       ...producto,
       [name]:
         name === "cantidad" || name === "precio_unitario"
-          ? Number(value) // Convertir a número
-          : value, // Mantener como texto para los demás
+          ? Number(value)
+          : value,
     });
   };
 
@@ -55,11 +73,16 @@ export default function ProductoForm() {
     }
 
     try {
-      const res = await axios.post("/api/products/", producto);
-      console.log(res);
-
+      if (isEditing) {
+        // Actualizar producto
+        await axios.put(`/api/products/${id}`, producto);
+        alert("Producto actualizado correctamente");
+      } else {
+        // Crear nuevo producto
+        await axios.post("/api/products/", producto);
+        alert("Producto registrado correctamente");
+      }
       router.push("/vista-producto");
-
       form.current.reset();
     } catch (error) {
       console.error("Error al guardar el producto:", error);
@@ -97,7 +120,7 @@ export default function ProductoForm() {
           component="h1"
           style={{ fontWeight: "bold", color: "#333" }}
         >
-          Registro de Producto
+          {isEditing ? "Editar Producto" : "Registro de Producto"}
         </Typography>
 
         <TextField

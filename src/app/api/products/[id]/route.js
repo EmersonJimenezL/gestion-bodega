@@ -92,6 +92,8 @@ export async function DELETE(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     const id = parseInt(params.id, 10);
+    const body = await request.json();
+
     if (isNaN(id)) {
       return NextResponse.json(
         { message: "ID inválido. Debe ser un número." },
@@ -99,72 +101,27 @@ export async function PUT(request, { params }) {
       );
     }
 
-    const data = await request.json();
-
-    const {
-      nombre,
-      descripcion,
-      categoria,
-      cantidad,
-      unidad_medida,
-      precio_unitario,
-    } = data;
-
-    if (
-      !nombre ||
-      !categoria ||
-      !cantidad ||
-      !unidad_medida ||
-      !precio_unitario ||
-      typeof nombre !== "string" ||
-      typeof categoria !== "string" ||
-      typeof unidad_medida !== "string" ||
-      typeof cantidad !== "number" ||
-      typeof precio_unitario !== "number" ||
-      cantidad < 0 ||
-      precio_unitario < 0
-    ) {
-      return NextResponse.json(
-        { message: "Datos inválidos o incompletos." },
-        { status: 400 }
-      );
-    }
-
-    const query = `
-      UPDATE inventario_material
-      SET nombre = ?, descripcion = ?, categoria = ?, cantidad = ?, unidad_medida = ?, precio_unitario = ?
-      WHERE ID = ?
-    `;
-    const results = await pool.query(query, [
-      nombre,
-      descripcion,
-      categoria,
-      cantidad,
-      unidad_medida,
-      precio_unitario,
-      id,
-    ]);
-
-    if (results.affectedRows === 0) {
-      return NextResponse.json(
-        { message: "Producto no encontrado o no se realizaron cambios." },
-        { status: 404 }
-      );
-    }
-
-    const updatedProduct = await pool.query(
-      "SELECT * FROM inventario_material WHERE ID = ?",
-      [id]
+    const result = await pool.query(
+      "UPDATE INVENTARIO_MATERIAL SET nombre = ?, descripcion = ?, categoria = ?, cantidad = ?, unidad_medida = ?, precio_unitario = ? WHERE id = ?",
+      [
+        body.nombre,
+        body.descripcion,
+        body.categoria,
+        body.cantidad,
+        body.unidad_medida,
+        body.precio_unitario,
+        id,
+      ]
     );
 
-    if (updatedProduct.length === 0) {
+    if (result.affectedRows === 0) {
       return NextResponse.json(
-        { message: "No se pudo recuperar el producto actualizado." },
-        { status: 404 }
+        { message: "No se pudo actualizar el producto." },
+        { status: 500 }
       );
     }
 
-    return NextResponse.json(updatedProduct[0]);
+    return NextResponse.json({ message: "Producto actualizado correctamente" });
   } catch (error) {
     console.error("Error al actualizar el producto:", error);
     return NextResponse.json(
