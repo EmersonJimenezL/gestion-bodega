@@ -39,7 +39,7 @@ const Login = () => {
       );
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("lastActivity", Date.now()); // Guarda el tiempo de actividad
-      router.push("/registro-producto");
+      router.push("/inicio");
     } catch (err) {
       setError("Inicio de sesión fallido. Por favor, revisa tus credenciales.");
     }
