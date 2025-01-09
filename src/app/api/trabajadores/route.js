@@ -1,17 +1,29 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/libs/mysql";
 
-export async function GET() {
-  try {
-    const results = await pool.query("SELECT * FROM EMPLEADOS");
-    return NextResponse.json({ empleados: results });
-  } catch (error) {
-    console.error("Error al conectar con la base de datos:", error);
-    return NextResponse.json(
-      { error: "Error al conectar con la base de datos" },
-      { status: 500 }
-    );
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const query = searchParams.get("query"); // El término de búsqueda
+
+  if (query) {
+    try {
+      const results = await pool.query(
+        "SELECT id, nombre FROM EMPLEADOS WHERE nombre LIKE ? LIMIT 10",
+        [`%${query}%`]
+      );
+      return NextResponse.json({ employees: results });
+    } catch (error) {
+      console.error("Error al buscar trabajadores:", error);
+      return NextResponse.json(
+        { error: "Error al buscar trabajadores." },
+        { status: 500 }
+      );
+    }
   }
+
+  // Comportamiento por defecto
+  const results = await pool.query("SELECT * FROM EMPLEADOS");
+  return NextResponse.json({ employees: results });
 }
 
 export async function POST(request) {

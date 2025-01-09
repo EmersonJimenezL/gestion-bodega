@@ -1,17 +1,29 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/libs/mysql";
 
-export async function GET() {
-  try {
-    const results = await pool.query("SELECT * FROM RETIROS_MATERIAL");
-    return NextResponse.json({ message: results });
-  } catch (error) {
-    console.error("Error al conectar con la base de datos:", error);
-    return NextResponse.json(
-      { error: "Error al conectar con la base de datos" },
-      { status: 500 }
-    );
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const query = searchParams.get("query"); // El término de búsqueda
+
+  if (query) {
+    try {
+      const results = await pool.query(
+        "SELECT id, nombre FROM INVENTARIO_MATERIAL WHERE nombre LIKE ? LIMIT 10",
+        [`%${query}%`]
+      );
+      return NextResponse.json({ materials: results });
+    } catch (error) {
+      console.error("Error al buscar materiales:", error);
+      return NextResponse.json(
+        { error: "Error al buscar materiales." },
+        { status: 500 }
+      );
+    }
   }
+
+  // Comportamiento por defecto
+  const results = await pool.query("SELECT * FROM INVENTARIO_MATERIAL");
+  return NextResponse.json({ materials: results });
 }
 
 export async function POST(request) {
