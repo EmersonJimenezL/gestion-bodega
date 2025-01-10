@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/libs/mysql";
 
-<<<<<<< HEAD
 export async function GET() {
   try {
     const results = await pool.query("SELECT * FROM EMPLEADOS");
@@ -21,31 +20,7 @@ export async function GET() {
       { error: "Error al conectar con la base de datos" },
       { status: 500 }
     );
-=======
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const query = searchParams.get("query"); // El término de búsqueda
-
-  if (query) {
-    try {
-      const results = await pool.query(
-        "SELECT id, nombre FROM EMPLEADOS WHERE nombre LIKE ? LIMIT 10",
-        [`%${query}%`]
-      );
-      return NextResponse.json({ employees: results });
-    } catch (error) {
-      console.error("Error al buscar trabajadores:", error);
-      return NextResponse.json(
-        { error: "Error al buscar trabajadores." },
-        { status: 500 }
-      );
-    }
->>>>>>> 4f057c0f767374449cd317203d1b32042dff7348
   }
-
-  // Comportamiento por defecto
-  const results = await pool.query("SELECT * FROM EMPLEADOS");
-  return NextResponse.json({ employees: results });
 }
 
 export async function POST(request) {

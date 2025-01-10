@@ -24,11 +24,11 @@ export default function FloatingButtons() {
   };
 
   const navigateToWithdrawals = () => {
-    router.push("/retiros");
+    router.push("/vista-retiros");
   };
 
   const navigateToRegisterWithdrawals = () => {
-    router.push("/registro-retiros");
+    router.push("/registro-retiro");
   };
 
   return (

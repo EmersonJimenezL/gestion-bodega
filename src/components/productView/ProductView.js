@@ -24,7 +24,7 @@ export default function ProductView() {
     async function cargarProductos() {
       try {
         const { data } = await axios.get("/api/products/");
-        setProducts(data.message);
+        setProducts(data); // Usa `data` directamente porque ya es un array.
       } catch (error) {
         console.error("Error al cargar los productos:", error);
       } finally {
