@@ -1,36 +1,10 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/libs/mysql";
 
-<<<<<<< HEAD
 export async function GET() {
   const results = await pool.query("SELECT * FROM RETIROS_MATERIAL");
   console.log(results);
   return NextResponse.json(results);
-=======
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const query = searchParams.get("query"); // El término de búsqueda
-
-  if (query) {
-    try {
-      const results = await pool.query(
-        "SELECT id, nombre FROM INVENTARIO_MATERIAL WHERE nombre LIKE ? LIMIT 10",
-        [`%${query}%`]
-      );
-      return NextResponse.json({ materials: results });
-    } catch (error) {
-      console.error("Error al buscar materiales:", error);
-      return NextResponse.json(
-        { error: "Error al buscar materiales." },
-        { status: 500 }
-      );
-    }
-  }
-
-  // Comportamiento por defecto
-  const results = await pool.query("SELECT * FROM INVENTARIO_MATERIAL");
-  return NextResponse.json({ materials: results });
->>>>>>> 4f057c0f767374449cd317203d1b32042dff7348
 }
 
 export async function POST(req) {
@@ -78,15 +52,17 @@ export async function POST(req) {
       { status: 500 }
     );
   }
-}
 
-// Funciones ficticias para obtener y actualizar materiales
-async function getMaterialById(id) {
-  // Aquí deberías obtener el material desde tu base de datos
-  return { id, nombre: "Producto 1", cantidad: 10 }; // Ejemplo
-}
+  // Funciones ficticias para obtener y actualizar materiales
+  async function getMaterialById(id) {
+    // Aquí deberías obtener el material desde tu base de datos
+    return { id, nombre: "Producto 1", cantidad: 10 }; // Ejemplo
+  }
 
-async function updateInventory(id, cantidad) {
-  // Aquí deberías actualizar la base de datos con el retiro
-  console.log(`Actualizando inventario: material ${id}, cantidad ${cantidad}`);
+  async function updateInventory(id, cantidad) {
+    // Aquí deberías actualizar la base de datos con el retiro
+    console.log(
+      `Actualizando inventario: material ${id}, cantidad ${cantidad}`
+    );
+  }
 }
