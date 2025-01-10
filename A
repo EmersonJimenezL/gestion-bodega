@@ -1,0 +1,26 @@
+<TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>ID Retiro</TableCell>
+            <TableCell>ID Material</TableCell>
+            <TableCell>ID Empleado</TableCell>
+            <TableCell>Cantidad</TableCell>
+            <TableCell>Fecha de Retiro</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.map((row) => (
+            <TableRow key={row.id}>
+              <TableCell>{row.id}</TableCell>
+              <TableCell>{row.id_material}</TableCell>
+              <TableCell>{row.id_empleado}</TableCell>
+              <TableCell>{row.cantidad}</TableCell>
+              <TableCell>
+                {new Date(row.fecha_retiro).toLocaleString()}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>

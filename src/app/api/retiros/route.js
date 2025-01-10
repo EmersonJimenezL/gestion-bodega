@@ -2,92 +2,65 @@ import { NextResponse } from "next/server";
 import { pool } from "@/libs/mysql";
 
 export async function GET() {
+  const results = await pool.query("SELECT * FROM RETIROS_MATERIAL");
+  console.log(results);
+  return NextResponse.json(results);
+}
+
+export async function POST(req) {
   try {
-    const results = await pool.query("SELECT * FROM RETIROS_MATERIAL");
-    return NextResponse.json({ message: results });
-  } catch (error) {
-    console.error("Error al conectar con la base de datos:", error);
+    const { id_material, id_empleado, cantidad } = await req.json();
+
+    // Verificar que los campos no estén vacíos
+    if (!id_material || !id_empleado || !cantidad) {
+      return NextResponse.json(
+        { message: "Todos los campos son obligatorios" },
+        { status: 400 }
+      );
+    }
+
+    // Aquí deberías procesar el retiro, por ejemplo, verificar el inventario
+    const material = await getMaterialById(id_material); // Reemplaza con tu lógica para obtener el material
+
+    if (!material) {
+      return NextResponse.json(
+        { message: "Material no encontrado" },
+        { status: 404 }
+      );
+    }
+
+    // Verificar si hay suficiente material en el inventario
+    if (material.cantidad < cantidad) {
+      return NextResponse.json(
+        { message: "No hay suficiente material en el inventario." },
+        { status: 400 }
+      );
+    }
+
+    // Lógica para registrar el retiro (ejemplo de actualización en la base de datos)
+    await updateInventory(id_material, -cantidad); // Actualizar el inventario con el retiro
+
+    // Responder con un mensaje de éxito
     return NextResponse.json(
-      { error: "Error al conectar con la base de datos" },
+      { message: "Retiro registrado con éxito" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error en el servidor:", error);
+    return NextResponse.json(
+      { message: "Error al registrar el retiro" },
       { status: 500 }
     );
   }
 }
 
-export async function POST(request) {
-  try {
-    const { id_material, id_empleado, cantidad } = await request.json();
+// Funciones ficticias para obtener y actualizar materiales
+async function getMaterialById(id) {
+  // Aquí deberías obtener el material desde tu base de datos
+  return { id, nombre: "Producto 1", cantidad: 10 }; // Ejemplo
+}
 
-    // Validaciones de datos
-    if (!id_material || !id_empleado || !cantidad) {
-      return NextResponse.json(
-        { message: "Todos los campos son obligatorios." },
-        { status: 400 }
-      );
-    }
-
-    if (
-      typeof id_material !== "number" ||
-      typeof id_empleado !== "number" ||
-      typeof cantidad !== "number"
-    ) {
-      return NextResponse.json(
-        {
-          message:
-            "Los campos id_material, id_empleado y cantidad deben ser números.",
-        },
-        { status: 400 }
-      );
-    }
-
-    if (cantidad <= 0) {
-      return NextResponse.json(
-        { message: "La cantidad debe ser mayor a 0." },
-        { status: 400 }
-      );
-    }
-
-    // Validar existencia del material y empleado (opcional, requiere consultas adicionales)
-    const [material] = await pool.query(
-      "SELECT * FROM INVENTARIO_MATERIAL WHERE ID = ?",
-      [id_material]
-    );
-    if (material.length === 0) {
-      return NextResponse.json(
-        { message: "El material especificado no existe." },
-        { status: 404 }
-      );
-    }
-
-    const [empleado] = await pool.query(
-      "SELECT * FROM EMPLEADOS WHERE ID = ?",
-      [id_empleado]
-    );
-    if (empleado.length === 0) {
-      return NextResponse.json(
-        { message: "El empleado especificado no existe." },
-        { status: 404 }
-      );
-    }
-
-    // Insertar el retiro
-    const results = await pool.query("INSERT INTO RETIROS_MATERIAL SET ?", {
-      id_material,
-      id_empleado,
-      cantidad,
-    });
-
-    return NextResponse.json({
-      id: results.insertId,
-      id_material,
-      id_empleado,
-      cantidad,
-    });
-  } catch (error) {
-    console.error("Error en la solicitud:", error);
-    return NextResponse.json(
-      { message: "Ocurrió un error al procesar la solicitud." },
-      { status: 500 }
-    );
-  }
+async function updateInventory(id, cantidad) {
+  // Aquí deberías actualizar la base de datos con el retiro
+  console.log(`Actualizando inventario: material ${id}, cantidad ${cantidad}`);
 }

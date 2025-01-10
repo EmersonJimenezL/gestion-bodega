@@ -4,8 +4,7 @@ import { pool } from "@/libs/mysql";
 export async function GET() {
   try {
     const results = await pool.query("SELECT * FROM inventario_material");
-    console.log(results);
-    return NextResponse.json({ message: results });
+    return NextResponse.json(results); // Directamente los productos
   } catch (error) {
     console.error("Error al conectar con la base de datos:", error);
     return NextResponse.json(

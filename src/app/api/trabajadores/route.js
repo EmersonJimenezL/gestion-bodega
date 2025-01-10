@@ -4,7 +4,16 @@ import { pool } from "@/libs/mysql";
 export async function GET() {
   try {
     const results = await pool.query("SELECT * FROM EMPLEADOS");
-    return NextResponse.json({ empleados: results });
+
+    // Verificamos si los resultados son los esperados
+    console.log("Resultados de la consulta a EMPLEADOS:", results);
+
+    // Aseguramos que la respuesta sea en formato JSON
+    return NextResponse.json(results, {
+      headers: {
+        "Content-Type": "application/json", // Aseguramos que el encabezado sea correcto
+      },
+    });
   } catch (error) {
     console.error("Error al conectar con la base de datos:", error);
     return NextResponse.json(
@@ -50,7 +59,7 @@ export async function POST(request) {
     }
 
     // Verificar si ya existe un empleado con el mismo RUT
-    const existingEmployee = await pool.query(
+    const [existingEmployee] = await pool.query(
       "SELECT * FROM EMPLEADOS WHERE rut = ?",
       [rut]
     );
@@ -62,8 +71,8 @@ export async function POST(request) {
       );
     }
 
-    // Insertar el nuevo empleado en la base de datos
-    const results = await pool.query("INSERT INTO EMPLEADOS SET ?", {
+    // Insertar el nuevo empleado
+    const [results] = await pool.query("INSERT INTO EMPLEADOS SET ?", {
       rut,
       nombre,
       apellido_paterno,
@@ -72,6 +81,7 @@ export async function POST(request) {
       cargo,
     });
 
+    // Retornar los datos del nuevo empleado
     return NextResponse.json({
       id: results.insertId,
       rut,
