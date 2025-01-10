@@ -21,6 +21,10 @@ export async function GET() {
       { status: 500 }
     );
   }
+
+  // Comportamiento por defecto
+  const results = await pool.query("SELECT * FROM EMPLEADOS");
+  return NextResponse.json({ employees: results });
 }
 
 export async function POST(request) {

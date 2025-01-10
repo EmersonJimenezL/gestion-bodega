@@ -1,8 +1,10 @@
 "use client";
+
 import RetirosForm from "../../components/retirosForm/RetirosForm";
 import withAuth from "../../components/withAuth";
 
-function registroRetiro() {
+function RegistroRetiro() {
+  useSessionTimeout();
   return (
     <div>
       <RetirosForm />
@@ -10,4 +12,4 @@ function registroRetiro() {
   );
 }
 
-export default withAuth(registroRetiro);
+export default withAuth(RegistroRetiro);
