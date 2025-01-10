@@ -102,7 +102,7 @@ export default function RetirosMaterialView() {
           fontWeight: "bold",
         }}
       >
-        Gestión de trabajadores
+        Gestión de retiros
       </Typography>
       <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mb: 4 }}>
         <Button

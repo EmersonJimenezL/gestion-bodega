@@ -2,16 +2,9 @@ import { NextResponse } from "next/server";
 import { pool } from "@/libs/mysql";
 
 export async function GET() {
-  try {
-    const results = await pool.query("SELECT * FROM inventario_material");
-    return NextResponse.json(results); // Directamente los productos
-  } catch (error) {
-    console.error("Error al conectar con la base de datos:", error);
-    return NextResponse.json(
-      { error: "Error al conectar con la base de datos" },
-      { status: 500 }
-    );
-  }
+  const results = await pool.query("SELECT * FROM INVENTARIO_MATERIAL");
+  console.log(results);
+  return NextResponse.json(results);
 }
 
 export async function POST(request) {

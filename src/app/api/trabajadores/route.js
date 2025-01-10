@@ -2,29 +2,9 @@ import { NextResponse } from "next/server";
 import { pool } from "@/libs/mysql";
 
 export async function GET() {
-  try {
-    const results = await pool.query("SELECT * FROM EMPLEADOS");
-
-    // Verificamos si los resultados son los esperados
-    console.log("Resultados de la consulta a EMPLEADOS:", results);
-
-    // Aseguramos que la respuesta sea en formato JSON
-    return NextResponse.json(results, {
-      headers: {
-        "Content-Type": "application/json", // Aseguramos que el encabezado sea correcto
-      },
-    });
-  } catch (error) {
-    console.error("Error al conectar con la base de datos:", error);
-    return NextResponse.json(
-      { error: "Error al conectar con la base de datos" },
-      { status: 500 }
-    );
-  }
-
-  // Comportamiento por defecto
   const results = await pool.query("SELECT * FROM EMPLEADOS");
-  return NextResponse.json({ employees: results });
+  console.log(results);
+  return NextResponse.json(results);
 }
 
 export async function POST(request) {

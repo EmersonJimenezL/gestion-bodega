@@ -27,7 +27,7 @@ export default function TrabajadoresView() {
     const cargarTrabajadores = async () => {
       try {
         const { data } = await axios.get("/api/trabajadores");
-        setTrabajadores(data.empleados);
+        setTrabajadores(data);
       } catch (error) {
         console.error("Error al cargar los trabajadores:", error);
       } finally {

@@ -2,6 +2,7 @@
 
 import RetirosForm from "../../components/retirosForm/RetirosForm";
 import withAuth from "../../components/withAuth";
+import { useSessionTimeout } from "@/middleware/auth";
 
 function RegistroRetiro() {
   useSessionTimeout();
