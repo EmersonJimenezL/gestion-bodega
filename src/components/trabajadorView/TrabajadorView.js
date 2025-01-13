@@ -11,12 +11,17 @@ import {
   Button,
   Box,
   Typography,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function TrabajadoresView() {
   const [trabajadores, setTrabajadores] = useState([]);
+  const [filteredTrabajadores, setFilteredTrabajadores] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
@@ -28,6 +33,7 @@ export default function TrabajadoresView() {
       try {
         const { data } = await axios.get("/api/trabajadores");
         setTrabajadores(data);
+        setFilteredTrabajadores(data); // Inicializamos los trabajadores filtrados
       } catch (error) {
         console.error("Error al cargar los trabajadores:", error);
       } finally {
@@ -36,6 +42,16 @@ export default function TrabajadoresView() {
     };
     cargarTrabajadores();
   }, []);
+
+  const handleSearch = (event) => {
+    const term = event.target.value.toLowerCase();
+    setSearchTerm(term);
+    setFilteredTrabajadores(
+      trabajadores.filter((trabajador) =>
+        trabajador.nombre.toLowerCase().includes(term)
+      )
+    );
+  };
 
   const handleUpdate = (id) => {
     router.push(`/registro-trabajador?id=${id}`);
@@ -58,12 +74,24 @@ export default function TrabajadoresView() {
     router.back(); // Ruta para volver a la pagina anterior
   };
 
-  const handleInventoriView = () => {
+  const handleProductView = () => {
     router.push("/vista-producto");
   };
 
   const handleRegisterWorker = () => {
     router.push("/registro-trabajador");
+  };
+
+  const handleRegisterProduct = () => {
+    router.push("/registro-producto");
+  };
+
+  const handleRegisterRetiro = () => {
+    router.push("/registro-retiro");
+  };
+
+  const handleRetiroView = () => {
+    router.push("/vista-retiros");
   };
 
   if (!isClient) {
@@ -100,6 +128,29 @@ export default function TrabajadoresView() {
       >
         Gestión de trabajadores
       </Typography>
+
+      {/* Barra de búsqueda */}
+      <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+        <TextField
+          variant="outlined"
+          placeholder="Buscar trabajador"
+          value={searchTerm}
+          onChange={handleSearch}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            backgroundColor: "#2d3748",
+            borderRadius: "8px",
+            input: { color: "#e2e8f0" },
+          }}
+        />
+      </Box>
+
       <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mb: 4 }}>
         <Button
           variant="outlined"
@@ -109,23 +160,51 @@ export default function TrabajadoresView() {
         >
           Volver
         </Button>
-        <Button
-          variant="outlined"
-          color="info"
-          sx={{ fontWeight: "bold", textTransform: "none" }}
-          onClick={handleInventoriView}
-        >
-          Inventario
-        </Button>
+
         <Button
           variant="outlined"
           color="info"
           sx={{ fontWeight: "bold", textTransform: "none" }}
           onClick={handleRegisterWorker}
         >
-          Registro de trabajador
+          Registro de trabajadores
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleProductView}
+        >
+          Listado de Material
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleRegisterProduct}
+        >
+          Registro de material
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleRetiroView}
+        >
+          Listado de retiros
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleRegisterRetiro}
+        >
+          Registro de retiros
         </Button>
       </Box>
+
       <TableContainer
         component={Paper}
         sx={{
@@ -157,7 +236,7 @@ export default function TrabajadoresView() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {trabajadores.map((trabajador) => (
+            {filteredTrabajadores.map((trabajador) => (
               <TableRow
                 key={trabajador.id}
                 sx={{

@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
+import {
+  TextField,
+  Container,
+  Button,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+} from "@mui/material";
 
-function Formulario() {
+export default function RegistroRetiros() {
   const [empleados, setEmpleados] = useState([]);
   const [productos, setProductos] = useState([]);
   const [fecha, setFecha] = useState("");
@@ -8,23 +19,12 @@ function Formulario() {
   const [productoSeleccionado, setProductoSeleccionado] = useState("");
   const [cantidad, setCantidad] = useState("");
 
-  // Obtener los datos de empleados y productos al cargar el formulario
   useEffect(() => {
     const fetchEmpleados = async () => {
       try {
         const response = await fetch("/api/trabajadores");
-        const text = await response.text();
-        console.log("Respuesta de la API empleados:", text);
-
-        try {
-          const data = JSON.parse(text);
-          setEmpleados(data);
-        } catch (jsonError) {
-          console.error(
-            "Error al parsear la respuesta JSON empleados:",
-            jsonError
-          );
-        }
+        const data = await response.json();
+        setEmpleados(data);
       } catch (error) {
         console.error("Error al obtener empleados:", error);
       }
@@ -33,18 +33,8 @@ function Formulario() {
     const fetchProductos = async () => {
       try {
         const response = await fetch("/api/products");
-        const text = await response.text();
-        console.log("Respuesta de la API productos:", text);
-
-        try {
-          const data = JSON.parse(text);
-          setProductos(data);
-        } catch (jsonError) {
-          console.error(
-            "Error al parsear la respuesta JSON productos:",
-            jsonError
-          );
-        }
+        const data = await response.json();
+        setProductos(data);
       } catch (error) {
         console.error("Error al obtener productos:", error);
       }
@@ -54,45 +44,31 @@ function Formulario() {
     fetchProductos();
   }, []);
 
-  // Obtener la fecha actual en formato 'yyyy-mm-dd'
   useEffect(() => {
     const currentDate = new Date().toISOString().split("T")[0];
     setFecha(currentDate);
   }, []);
 
-  // Manejo del submit del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Verificar que los campos estén llenos
     if (!empleadoSeleccionado || !productoSeleccionado || !cantidad) {
       alert("Todos los campos son obligatorios");
       return;
     }
 
-    // Verificar que los valores de empleado y producto sean números
     const empleadoId = Number(empleadoSeleccionado);
     const productoId = Number(productoSeleccionado);
     const cantidadValor = Number(cantidad);
 
-    // Verificar si los valores son válidos
     if (isNaN(empleadoId) || isNaN(productoId) || isNaN(cantidadValor)) {
       alert("Los valores deben ser números válidos.");
       return;
     }
 
-    // Verificar que la cantidad sea mayor a cero
     if (cantidadValor <= 0) {
       alert("La cantidad debe ser mayor a cero.");
       return;
     }
-
-    console.log("Datos enviados:", {
-      empleadoId,
-      productoId,
-      cantidadValor,
-      fecha,
-    });
 
     const data = {
       id_material: productoId,
@@ -109,18 +85,10 @@ function Formulario() {
         body: JSON.stringify(data),
       });
 
-      // Verificar si la respuesta es exitosa
       if (response.ok) {
-        const result = await response.json();
         alert("Retiro registrado con éxito");
-        console.log("Resultado de la respuesta:", result); // Mostrar el contenido completo de la respuesta
       } else {
-        const result = await response.json();
-        console.error("Error en la respuesta:", result);
-        alert(
-          "Error al registrar el retiro: " + result.message ||
-            "Error desconocido"
-        );
+        alert("Error al registrar el retiro");
       }
     } catch (error) {
       console.error("Error al realizar la solicitud:", error);
@@ -129,77 +97,137 @@ function Formulario() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>
-          Empleado:
-          <select
-            name="empleado"
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#121212",
+      }}
+    >
+      <Container
+        maxWidth="sm"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 20,
+          padding: 30,
+          backgroundColor: "#1f1f1f",
+          borderRadius: 15,
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.7)",
+        }}
+      >
+        <Typography
+          variant="h5"
+          component="h1"
+          style={{
+            fontWeight: "bold",
+            color: "#ffffff",
+            textAlign: "center",
+          }}
+        >
+          Registro de Retiros
+        </Typography>
+        <FormControl
+          fullWidth
+          style={{ backgroundColor: "#333", borderRadius: 5 }}
+        >
+          <InputLabel id="empleado-label" style={{ color: "#fff" }}>
+            Seleccionar Empleado
+          </InputLabel>
+          <Select
+            labelId="empleado-label"
             value={empleadoSeleccionado}
             onChange={(e) => setEmpleadoSeleccionado(e.target.value)}
-            required
+            style={{ color: "#fff", backgroundColor: "#333", borderRadius: 5 }}
           >
-            <option value="">Seleccionar Empleado</option>
             {empleados.map((empleado) => (
-              <option key={empleado.id} value={empleado.id}>
-                {empleado.nombre} {empleado.apellido_paterno}
-              </option>
+              <MenuItem key={empleado.id} value={empleado.id}>
+                {empleado.nombre}
+              </MenuItem>
             ))}
-          </select>
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Producto:
-          <select
-            name="producto"
+          </Select>
+        </FormControl>
+        <FormControl
+          fullWidth
+          style={{ backgroundColor: "#333", borderRadius: 5 }}
+        >
+          <InputLabel id="producto-label" style={{ color: "#fff" }}>
+            Seleccionar Producto
+          </InputLabel>
+          <Select
+            labelId="producto-label"
             value={productoSeleccionado}
             onChange={(e) => setProductoSeleccionado(e.target.value)}
-            required
-            disabled={productos.length === 0}
+            style={{ color: "#fff", backgroundColor: "#333", borderRadius: 5 }}
           >
-            <option value="">Seleccionar Producto</option>
-            {productos.length > 0 &&
-              productos.map((producto) => (
-                <option key={producto.id} value={producto.id}>
-                  {producto.nombre}
-                </option>
-              ))}
-          </select>
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Cantidad:
-          <input
-            type="number"
-            name="cantidad"
-            value={cantidad}
-            onChange={(e) => setCantidad(e.target.value)}
-            required
-            min="1"
-          />
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Fecha:
-          <input
-            type="date"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-            required
-            disabled
-          />
-        </label>
-      </div>
-
-      <button type="submit">Registrar Retiro</button>
+            {productos.map((producto) => (
+              <MenuItem key={producto.id} value={producto.id}>
+                {producto.nombre}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <TextField
+          label="Cantidad"
+          type="number"
+          value={cantidad}
+          onChange={(e) => setCantidad(e.target.value)}
+          variant="outlined"
+          fullWidth
+          style={{
+            backgroundColor: "#333",
+            borderRadius: 5,
+            color: "white",
+          }}
+        />
+        <TextField
+          label="Fecha"
+          variant="outlined"
+          value={fecha}
+          disabled
+          fullWidth
+          style={{
+            backgroundColor: "#333",
+            borderRadius: 5,
+            color: "#fff",
+          }}
+        />
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item>
+            <Button
+              type="submit"
+              variant="contained"
+              style={{
+                backgroundColor: "#007bff",
+                color: "#fff",
+                fontWeight: "bold",
+                fontSize: "16px",
+                padding: "12px 24px",
+              }}
+            >
+              Guardar
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              onClick={() => history.back()}
+              variant="outlined"
+              style={{
+                borderColor: "#007bff",
+                color: "#007bff",
+                fontWeight: "bold",
+                fontSize: "16px",
+                padding: "12px 24px",
+              }}
+            >
+              Volver
+            </Button>
+          </Grid>
+        </Grid>
+      </Container>
     </form>
   );
 }
-
-export default Formulario;

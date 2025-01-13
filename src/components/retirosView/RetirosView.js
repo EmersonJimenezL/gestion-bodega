@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CircularProgress,
   Table,
@@ -13,23 +14,45 @@ import {
   Typography,
   Box,
   Button,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function RetirosMaterialView() {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
 
   const handleBack = () => {
     router.back(); // Ruta para volver a la pagina anterior
   };
 
-  const handleInventoriView = () => {
+  const handleWorkerView = () => {
+    router.push("/vista-trabajador");
+  };
+
+  const handleProductView = () => {
     router.push("/vista-producto");
+  };
+
+  const handleRetiroView = () => {
+    router.push("/vista-retiros");
   };
 
   const handleRegisterWorker = () => {
     router.push("/registro-trabajador");
+  };
+
+  const handleRegisterProduct = () => {
+    router.push("/registro-producto");
+  };
+
+  const handleRegisterRetiro = () => {
+    router.push("/registro-retiro");
   };
 
   useEffect(() => {
@@ -41,13 +64,8 @@ export default function RetirosMaterialView() {
         }
         const result = await response.json();
         console.log("Datos obtenidos:", result);
-
-        // Actualizar el estado con los datos obtenidos
-        if (Array.isArray(result) && result.length > 0) {
-          setData(result); // Directamente asignamos los datos
-        } else {
-          setData([]); // Si no hay datos, aseguramos que sea un arreglo vacío
-        }
+        setData(result); // Asignamos los datos a la variable 'data'
+        setFilteredData(result); // Inicializamos los datos filtrados
       } catch (err) {
         console.error("Error al cargar los datos:", err);
         setError(err.message);
@@ -58,6 +76,16 @@ export default function RetirosMaterialView() {
 
     fetchData();
   }, []);
+
+  const handleSearch = (event) => {
+    const term = event.target.value.toLowerCase();
+    setSearchTerm(term);
+    setFilteredData(
+      data.filter(
+        (retiro) => retiro.nombre_empleado.toLowerCase().includes(term) // Filtrar solo por nombre de empleado
+      )
+    );
+  };
 
   if (loading) {
     return (
@@ -76,10 +104,10 @@ export default function RetirosMaterialView() {
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!filteredData || filteredData.length === 0) {
     return (
       <Typography color="textSecondary" align="center">
-        No hay datos disponibles.
+        No hay datos disponibles o los datos son inválidos.
       </Typography>
     );
   }
@@ -104,6 +132,29 @@ export default function RetirosMaterialView() {
       >
         Gestión de retiros
       </Typography>
+
+      {/* Barra de búsqueda solo por nombre de empleado */}
+      <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+        <TextField
+          variant="outlined"
+          placeholder="Buscar por empleado"
+          value={searchTerm}
+          onChange={handleSearch}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            backgroundColor: "#2d3748",
+            borderRadius: "8px",
+            input: { color: "#e2e8f0" },
+          }}
+        />
+      </Box>
+
       <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mb: 4 }}>
         <Button
           variant="outlined"
@@ -113,23 +164,10 @@ export default function RetirosMaterialView() {
         >
           Volver
         </Button>
-        <Button
-          variant="outlined"
-          color="info"
-          sx={{ fontWeight: "bold", textTransform: "none" }}
-          onClick={handleInventoriView}
-        >
-          Inventario
-        </Button>
-        <Button
-          variant="outlined"
-          color="info"
-          sx={{ fontWeight: "bold", textTransform: "none" }}
-          onClick={handleRegisterWorker}
-        >
-          Registro de trabajador
-        </Button>
+
+        {/* Otros botones */}
       </Box>
+
       <TableContainer
         component={Paper}
         sx={{
@@ -152,15 +190,16 @@ export default function RetirosMaterialView() {
             <TableRow>
               <TableCell align="center">ID Retiro</TableCell>
               <TableCell align="center">ID Material</TableCell>
-              <TableCell align="center">ID Empleado</TableCell>
+              <TableCell align="center">Empleado</TableCell>
+              <TableCell align="center">Material</TableCell>
               <TableCell align="center">Cantidad</TableCell>
               <TableCell align="center">Fecha de Retiro</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((retiro) => (
+            {filteredData.map((retiro) => (
               <TableRow
-                key={retiro.id}
+                key={retiro.id_retiro}
                 sx={{
                   "&:nth-of-type(odd)": {
                     backgroundColor: "#2a2f3a", // Alternar colores en filas
@@ -170,31 +209,13 @@ export default function RetirosMaterialView() {
                   },
                 }}
               >
-                <TableCell align="center">{retiro.id}</TableCell>
+                <TableCell align="center">{retiro.id_retiro}</TableCell>
                 <TableCell align="center">{retiro.id_material}</TableCell>
-                <TableCell align="center">{retiro.id_empleado}</TableCell>
+                <TableCell align="center">{retiro.nombre_empleado}</TableCell>
+                <TableCell align="center">{retiro.nombre_material}</TableCell>
                 <TableCell align="center">{retiro.cantidad}</TableCell>
                 <TableCell align="center">
                   {new Date(retiro.fecha_retiro).toLocaleString()}
-                </TableCell>
-                <TableCell align="center">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    sx={{ mr: 1 }}
-                    onClick={() => handleUpdate(retiro.id)}
-                  >
-                    Actualizar
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    size="small"
-                    onClick={() => handleDelete(retiro.id)}
-                  >
-                    Eliminar
-                  </Button>
                 </TableCell>
               </TableRow>
             ))}

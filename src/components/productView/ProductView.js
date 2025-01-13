@@ -9,11 +9,20 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
-import { Box, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function ProductView() {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
@@ -24,7 +33,8 @@ export default function ProductView() {
     async function cargarProductos() {
       try {
         const { data } = await axios.get("/api/products/");
-        setProducts(data); // Usa `data` directamente porque ya es un array.
+        setProducts(data);
+        setFilteredProducts(data);
       } catch (error) {
         console.error("Error al cargar los productos:", error);
       } finally {
@@ -33,6 +43,14 @@ export default function ProductView() {
     }
     cargarProductos();
   }, []);
+
+  const handleSearch = (event) => {
+    const term = event.target.value.toLowerCase();
+    setSearchTerm(term);
+    setFilteredProducts(
+      products.filter((product) => product.nombre.toLowerCase().includes(term))
+    );
+  };
 
   const handleUpdate = (id) => {
     router.push(`/registro-producto?id=${id}`);
@@ -46,15 +64,27 @@ export default function ProductView() {
   };
 
   const handleBack = () => {
-    router.back(); // Ruta para volver a la pagina anterior
+    router.back();
   };
 
   const handleWorkerView = () => {
     router.push("/vista-trabajador");
   };
 
+  const handleRegisterWorker = () => {
+    router.push("/registro-trabajador");
+  };
+
   const handleRegisterProduct = () => {
     router.push("/registro-producto");
+  };
+
+  const handleRegisterRetiro = () => {
+    router.push("/registro-retiro");
+  };
+
+  const handleRetiroView = () => {
+    router.push("/vista-retiros");
   };
 
   if (!isClient) {
@@ -75,7 +105,7 @@ export default function ProductView() {
     <Box
       sx={{
         p: 4,
-        backgroundColor: "#1a202c", // Fondo oscuro
+        backgroundColor: "#1a202c",
         minHeight: "100vh",
         color: "#fff",
       }}
@@ -89,8 +119,31 @@ export default function ProductView() {
           fontWeight: "bold",
         }}
       >
-        Gestión de Productos
+        Gestión de Inventario
       </Typography>
+
+      {/* Barra de búsqueda */}
+      <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+        <TextField
+          variant="outlined"
+          placeholder="Buscar material"
+          value={searchTerm}
+          onChange={handleSearch}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            backgroundColor: "#2d3748",
+            borderRadius: "8px",
+            input: { color: "#e2e8f0" },
+          }}
+        />
+      </Box>
+
       <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mb: 4 }}>
         <Button
           variant="outlined"
@@ -106,7 +159,15 @@ export default function ProductView() {
           sx={{ fontWeight: "bold", textTransform: "none" }}
           onClick={handleWorkerView}
         >
-          Trabajadores
+          Listado de trabajadores
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleRegisterWorker}
+        >
+          Registro de trabajadores
         </Button>
         <Button
           variant="outlined"
@@ -114,16 +175,33 @@ export default function ProductView() {
           sx={{ fontWeight: "bold", textTransform: "none" }}
           onClick={handleRegisterProduct}
         >
-          Registro de producto
+          Registro de material
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleRetiroView}
+        >
+          Listado de retiros
+        </Button>
+        <Button
+          variant="outlined"
+          color="info"
+          sx={{ fontWeight: "bold", textTransform: "none" }}
+          onClick={handleRegisterRetiro}
+        >
+          Registro de retiros
         </Button>
       </Box>
+
       <TableContainer
         component={Paper}
         sx={{
           borderRadius: "8px",
           boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.3)",
           overflowX: "auto",
-          backgroundColor: "#2d3748", // Color de fondo oscuro para la tabla
+          backgroundColor: "#2d3748",
         }}
       >
         <Table
@@ -148,16 +226,12 @@ export default function ProductView() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <TableRow
                 key={product.id}
                 sx={{
-                  "&:nth-of-type(odd)": {
-                    backgroundColor: "#2a2f3a", // Alternar colores en filas
-                  },
-                  "&:nth-of-type(even)": {
-                    backgroundColor: "#1f2733",
-                  },
+                  "&:nth-of-type(odd)": { backgroundColor: "#2a2f3a" },
+                  "&:nth-of-type(even)": { backgroundColor: "#1f2733" },
                 }}
               >
                 <TableCell align="center">{product.id}</TableCell>
