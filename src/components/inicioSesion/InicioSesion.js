@@ -18,10 +18,10 @@ const Login = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Verifica si el usuario ya tiene una sesión activa
-    const token = localStorage.getItem("token");
+    // Verifica si hay un token en sessionStorage
+    const token = sessionStorage.getItem("token");
     if (token) {
-      router.push("/vista-producto");
+      router.push("/inicio");
     }
   }, [router]);
 
@@ -32,13 +32,12 @@ const Login = () => {
         "/api/login",
         { username, password },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("lastActivity", Date.now()); // Guarda el tiempo de actividad
+      // Guarda el token y la actividad en sessionStorage
+      sessionStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("lastActivity", Date.now());
       router.push("/inicio");
     } catch (err) {
       setError("Inicio de sesión fallido. Por favor, revisa tus credenciales.");

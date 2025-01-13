@@ -1,10 +1,8 @@
-// src/app/api/login/route.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mysql from "mysql2/promise";
 
 const dbConfig = {
-  // host: "192.168.0.193",
   host: "127.0.0.1",
   user: "Galut_Rendich",
   password: "Gestion-Bodega-2",
@@ -46,13 +44,22 @@ export async function POST(req) {
       );
     }
 
-    // Añade esta línea para verificar que JWT_SECRET tiene un valor
-    console.log("JWT_SECRET:", process.env.JWT_SECRET);
-
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "15m", // Token expira en 15 minutos
     });
-    return new Response(JSON.stringify({ token }), { status: 200 });
+
+    const response = new Response(
+      JSON.stringify({ message: "Inicio de sesión exitoso" }),
+      { status: 200 }
+    );
+
+    // Establece la cookie del token
+    response.headers.append(
+      "Set-Cookie",
+      `token=${token}; HttpOnly; Path=/; Max-Age=900; SameSite=Strict`
+    );
+
+    return response;
   } catch (error) {
     console.error("Error en la consulta:", error);
     return new Response(
@@ -60,4 +67,20 @@ export async function POST(req) {
       { status: 500 }
     );
   }
+}
+
+// Ruta para cerrar sesión (eliminar cookie)
+export async function DELETE(req) {
+  const response = new Response(
+    JSON.stringify({ message: "Sesión cerrada con éxito" }),
+    { status: 200 }
+  );
+
+  // Elimina la cookie "token" configurando Max-Age a 0
+  response.headers.append(
+    "Set-Cookie",
+    "token=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict; Secure"
+  );
+
+  return response;
 }

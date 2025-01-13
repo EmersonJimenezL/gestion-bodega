@@ -6,18 +6,19 @@ export const useSessionTimeout = () => {
 
   useEffect(() => {
     const checkInactivity = () => {
-      const lastActivity = localStorage.getItem("lastActivity");
+      const lastActivity = sessionStorage.getItem("lastActivity");
       const now = Date.now();
 
-      if (lastActivity && now - parseInt(lastActivity, 10) > 30 * 60 * 1000) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("lastActivity");
-        router.push("/login");
+      // Verifica si el tiempo de inactividad es mayor a 15 minutos
+      if (lastActivity && now - parseInt(lastActivity, 10) > 15 * 60 * 1000) {
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("lastActivity");
+        router.push("/inicio-sesion"); // Redirige al login
       }
     };
 
     const updateActivity = () => {
-      localStorage.setItem("lastActivity", Date.now());
+      sessionStorage.setItem("lastActivity", Date.now().toString());
     };
 
     // Verifica la inactividad cada minuto
@@ -26,6 +27,9 @@ export const useSessionTimeout = () => {
     // Escucha eventos de actividad del usuario
     window.addEventListener("mousemove", updateActivity);
     window.addEventListener("keypress", updateActivity);
+
+    // Inicializa la actividad al cargar la página
+    updateActivity();
 
     return () => {
       clearInterval(interval);
