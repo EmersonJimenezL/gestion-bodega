@@ -3,6 +3,7 @@ import { pool } from "@/libs/mysql";
 
 export async function GET(request, { params }) {
   try {
+    // Asegurarse de que el id esté presente
     const id = parseInt(params.id, 10);
     if (isNaN(id)) {
       return NextResponse.json(
@@ -45,7 +46,6 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Verificar si el producto existe antes de intentar eliminarlo
     const checkResult = await pool.query(
       "SELECT * FROM INVENTARIO_MATERIAL WHERE ID = ?",
       [productId]
@@ -91,6 +91,7 @@ export async function DELETE(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
+    // Esperar el parámetro y asegurarse de que sea un número
     const id = parseInt(params.id, 10);
     const body = await request.json();
 

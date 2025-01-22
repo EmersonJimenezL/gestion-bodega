@@ -18,10 +18,10 @@ const Login = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Verifica si hay un token en sessionStorage
-    const token = sessionStorage.getItem("token");
+    // Verifica si el usuario ya tiene una sesión activa
+    const token = localStorage.getItem("token");
     if (token) {
-      router.push("/inicio");
+      router.push("/vista-producto");
     }
   }, [router]);
 
@@ -32,12 +32,13 @@ const Login = () => {
         "/api/login",
         { username, password },
         {
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
-      // Guarda el token y la actividad en sessionStorage
-      sessionStorage.setItem("token", response.data.token);
-      sessionStorage.setItem("lastActivity", Date.now());
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("lastActivity", Date.now()); // Guarda el tiempo de actividad
       router.push("/inicio");
     } catch (err) {
       setError("Inicio de sesión fallido. Por favor, revisa tus credenciales.");
@@ -45,78 +46,82 @@ const Login = () => {
   };
 
   return (
-    <Container
-      maxWidth="xs"
+    <Box
       sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        p: 4,
+        backgroundColor: "#1a202c",
         minHeight: "100vh",
+        color: "#fff",
       }}
     >
-      <Paper
-        elevation={4}
+      <Container
+        maxWidth="xs"
         sx={{
-          padding: 4,
-          borderRadius: 4,
-          backgroundColor: "#f9f9f9",
-          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
         }}
       >
-        <Box sx={{ textAlign: "center", mb: 3 }}>
-          <Typography variant="h4" component="h1" color="primary" gutterBottom>
-            Bienvenido
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
-            Inicia sesión para continuar
-          </Typography>
-        </Box>
-        {error && (
-          <Typography color="error" sx={{ mb: 2 }}>
-            {error}
-          </Typography>
-        )}
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Usuario"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <TextField
-            label="Contraseña"
-            variant="outlined"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2, py: 1.5, fontWeight: "bold", textTransform: "none" }}
-          >
-            Ingresar
-          </Button>
-        </form>
-        <Typography
-          variant="body2"
-          color="textSecondary"
-          align="center"
-          sx={{ mt: 2 }}
+        <Paper
+          elevation={4}
+          sx={{
+            padding: 4,
+            borderRadius: 4,
+            backgroundColor: "silver",
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          }}
         >
-          ¿Olvidaste tu contraseña?{" "}
-          <a href="#" style={{ color: "#1976d2", textDecoration: "none" }}>
-            Recupérala aquí
-          </a>
-        </Typography>
-      </Paper>
-    </Container>
+          <Box sx={{ textAlign: "center", mb: 3 }}>
+            <Typography variant="h4" component="h1" color="black" gutterBottom>
+              Bienvenido
+            </Typography>
+            <Typography variant="body1" color="textSecondary">
+              Inicia sesión para continuar
+            </Typography>
+          </Box>
+          {error && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Usuario"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <TextField
+              label="Contraseña"
+              variant="outlined"
+              type="password"
+              fullWidth
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{
+                mt: 2,
+                py: 1.5,
+                fontWeight: "bold",
+                textTransform: "none",
+                background: "black",
+              }}
+            >
+              Ingresar
+            </Button>
+          </form>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 

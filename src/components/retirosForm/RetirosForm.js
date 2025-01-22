@@ -20,28 +20,19 @@ export default function RegistroRetiros() {
   const [cantidad, setCantidad] = useState("");
 
   useEffect(() => {
-    const fetchEmpleados = async () => {
+    const fetchData = async (endpoint, setter, errorMsg) => {
       try {
-        const response = await fetch("/api/trabajadores");
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error(errorMsg);
         const data = await response.json();
-        setEmpleados(data);
+        setter(data);
       } catch (error) {
-        console.error("Error al obtener empleados:", error);
+        console.error(errorMsg, error);
       }
     };
 
-    const fetchProductos = async () => {
-      try {
-        const response = await fetch("/api/products");
-        const data = await response.json();
-        setProductos(data);
-      } catch (error) {
-        console.error("Error al obtener productos:", error);
-      }
-    };
-
-    fetchEmpleados();
-    fetchProductos();
+    fetchData("/api/trabajadores", setEmpleados, "Error al obtener empleados");
+    fetchData("/api/products", setProductos, "Error al obtener productos");
   }, []);
 
   useEffect(() => {
@@ -51,29 +42,16 @@ export default function RegistroRetiros() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!empleadoSeleccionado || !productoSeleccionado || !cantidad) {
       alert("Todos los campos son obligatorios");
       return;
     }
 
-    const empleadoId = Number(empleadoSeleccionado);
-    const productoId = Number(productoSeleccionado);
-    const cantidadValor = Number(cantidad);
-
-    if (isNaN(empleadoId) || isNaN(productoId) || isNaN(cantidadValor)) {
-      alert("Los valores deben ser números válidos.");
-      return;
-    }
-
-    if (cantidadValor <= 0) {
-      alert("La cantidad debe ser mayor a cero.");
-      return;
-    }
-
     const data = {
-      id_material: productoId,
-      id_empleado: empleadoId,
-      cantidad: cantidadValor,
+      id_material: Number(productoSeleccionado),
+      id_empleado: Number(empleadoSeleccionado),
+      cantidad: Number(cantidad),
     };
 
     try {
@@ -87,8 +65,12 @@ export default function RegistroRetiros() {
 
       if (response.ok) {
         alert("Retiro registrado con éxito");
+        setEmpleadoSeleccionado("");
+        setProductoSeleccionado("");
+        setCantidad("");
       } else {
-        alert("Error al registrar el retiro");
+        const errorMsg = await response.json();
+        alert(`Error al registrar el retiro: ${errorMsg.message}`);
       }
     } catch (error) {
       console.error("Error al realizar la solicitud:", error);
@@ -130,10 +112,7 @@ export default function RegistroRetiros() {
         >
           Registro de Retiros
         </Typography>
-        <FormControl
-          fullWidth
-          style={{ backgroundColor: "#333", borderRadius: 5 }}
-        >
+        <FormControl fullWidth>
           <InputLabel id="empleado-label" style={{ color: "#fff" }}>
             Seleccionar Empleado
           </InputLabel>
@@ -141,7 +120,7 @@ export default function RegistroRetiros() {
             labelId="empleado-label"
             value={empleadoSeleccionado}
             onChange={(e) => setEmpleadoSeleccionado(e.target.value)}
-            style={{ color: "#fff", backgroundColor: "#333", borderRadius: 5 }}
+            style={{ color: "#fff", backgroundColor: "#333" }}
           >
             {empleados.map((empleado) => (
               <MenuItem key={empleado.id} value={empleado.id}>
@@ -150,10 +129,7 @@ export default function RegistroRetiros() {
             ))}
           </Select>
         </FormControl>
-        <FormControl
-          fullWidth
-          style={{ backgroundColor: "#333", borderRadius: 5 }}
-        >
+        <FormControl fullWidth>
           <InputLabel id="producto-label" style={{ color: "#fff" }}>
             Seleccionar Producto
           </InputLabel>
@@ -161,7 +137,7 @@ export default function RegistroRetiros() {
             labelId="producto-label"
             value={productoSeleccionado}
             onChange={(e) => setProductoSeleccionado(e.target.value)}
-            style={{ color: "#fff", backgroundColor: "#333", borderRadius: 5 }}
+            style={{ color: "#fff", backgroundColor: "#333" }}
           >
             {productos.map((producto) => (
               <MenuItem key={producto.id} value={producto.id}>
@@ -175,13 +151,8 @@ export default function RegistroRetiros() {
           type="number"
           value={cantidad}
           onChange={(e) => setCantidad(e.target.value)}
-          variant="outlined"
           fullWidth
-          style={{
-            backgroundColor: "#333",
-            borderRadius: 5,
-            color: "white",
-          }}
+          style={{ backgroundColor: "#333", color: "#fff" }}
         />
         <TextField
           label="Fecha"
@@ -189,24 +160,14 @@ export default function RegistroRetiros() {
           value={fecha}
           disabled
           fullWidth
-          style={{
-            backgroundColor: "#333",
-            borderRadius: 5,
-            color: "#fff",
-          }}
+          style={{ backgroundColor: "#333", color: "#fff" }}
         />
         <Grid container spacing={2} justifyContent="center">
           <Grid item>
             <Button
               type="submit"
               variant="contained"
-              style={{
-                backgroundColor: "#007bff",
-                color: "#fff",
-                fontWeight: "bold",
-                fontSize: "16px",
-                padding: "12px 24px",
-              }}
+              style={{ backgroundColor: "#007bff", color: "#fff" }}
             >
               Guardar
             </Button>
@@ -215,13 +176,7 @@ export default function RegistroRetiros() {
             <Button
               onClick={() => history.back()}
               variant="outlined"
-              style={{
-                borderColor: "#007bff",
-                color: "#007bff",
-                fontWeight: "bold",
-                fontSize: "16px",
-                padding: "12px 24px",
-              }}
+              style={{ color: "#007bff", borderColor: "#007bff" }}
             >
               Volver
             </Button>

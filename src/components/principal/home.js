@@ -7,28 +7,26 @@ export default function FloatingButtons() {
   const router = useRouter();
 
   // Funciones para redirigir
-  const navigateToInventory = () => {
-    router.push("/vista-producto");
+  const navigateTo = (path) => {
+    router.push(path);
   };
 
-  const navigateToWorkers = () => {
-    router.push("/vista-trabajador");
-  };
-
-  const navigateToRegisterWorker = () => {
-    router.push("/registro-trabajador");
-  };
-
-  const navigateToRegisterMaterial = () => {
-    router.push("/registro-producto");
-  };
-
-  const navigateToWithdrawals = () => {
-    router.push("/vista-retiros");
-  };
-
-  const navigateToRegisterWithdrawals = () => {
-    router.push("/registro-retiro");
+  const buttonStyles = {
+    width: "120px",
+    height: "120px",
+    borderRadius: "50%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontWeight: "bold",
+    textTransform: "none",
+    color: "#fff", // Letra blanca
+    boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.3)",
+    transition:
+      "transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
+    padding: "0",
+    minWidth: "auto",
+    animation: "float 2s ease-in-out infinite",
   };
 
   return (
@@ -73,179 +71,66 @@ export default function FloatingButtons() {
           zIndex: 2,
         }}
       >
-        <Zoom in={true} timeout={500}>
-          <Button
-            sx={{
-              backgroundColor: "#4A5568", // Gris oscuro
-              color: "#fff",
-              fontWeight: "bold",
-              textTransform: "none",
-              width: "120px", // Botón más grande
-              height: "120px", // Botón más grande
-              borderRadius: "50%", // Botón circular
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.3)", // Sombra más pronunciada
-              "&:hover": {
-                backgroundColor: "#2D3748",
-              },
-              transition:
-                "transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
-              padding: "0",
-              minWidth: "auto",
-              animation: "float 2s ease-in-out infinite", // Animación de flotación constante
-            }}
-            onClick={navigateToInventory}
-          >
-            Inventario
-          </Button>
-        </Zoom>
-
-        <Zoom in={true} timeout={600}>
-          <Button
-            sx={{
-              backgroundColor: "#2D3748", // Gris oscuro
-              color: "#fff",
-              fontWeight: "bold",
-              textTransform: "none",
-              width: "120px", // Botón más grande
-              height: "120px", // Botón más grande
-              borderRadius: "50%", // Botón circular
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.3)",
-              "&:hover": {
-                backgroundColor: "#4A5568",
-              },
-              transition:
-                "transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
-              padding: "0",
-              minWidth: "auto",
-              animation: "float 2s ease-in-out infinite",
-            }}
-            onClick={navigateToWorkers}
-          >
-            Trabajadores
-          </Button>
-        </Zoom>
-
-        <Zoom in={true} timeout={700}>
-          <Button
-            sx={{
-              backgroundColor: "#2B6CB0", // Azul oscuro
-              color: "#fff",
-              fontWeight: "bold",
-              textTransform: "none",
-              width: "120px",
-              height: "120px",
-              borderRadius: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.3)",
-              "&:hover": {
-                backgroundColor: "#3182CE",
-              },
-              transition:
-                "transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
-              padding: "0",
-              minWidth: "auto",
-              animation: "float 2s ease-in-out infinite",
-            }}
-            onClick={navigateToRegisterWorker}
-          >
-            Registro de Trabajadores
-          </Button>
-        </Zoom>
-
-        <Zoom in={true} timeout={800}>
-          <Button
-            sx={{
-              backgroundColor: "#4A5568", // Gris oscuro
-              color: "#fff",
-              fontWeight: "bold",
-              textTransform: "none",
-              width: "120px",
-              height: "120px",
-              borderRadius: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.3)",
-              "&:hover": {
-                backgroundColor: "#2D3748",
-              },
-              transition:
-                "transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
-              padding: "0",
-              minWidth: "auto",
-              animation: "float 2s ease-in-out infinite",
-            }}
-            onClick={navigateToRegisterMaterial}
-          >
-            Registro de Material
-          </Button>
-        </Zoom>
-
-        <Zoom in={true} timeout={900}>
-          <Button
-            sx={{
-              backgroundColor: "#38B2AC", // Verde oscuro
-              color: "#fff",
-              fontWeight: "bold",
-              textTransform: "none",
-              width: "120px",
-              height: "120px",
-              borderRadius: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.3)",
-              "&:hover": {
-                backgroundColor: "#319795",
-              },
-              transition:
-                "transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
-              padding: "0",
-              minWidth: "auto",
-              animation: "float 2s ease-in-out infinite",
-            }}
-            onClick={navigateToWithdrawals}
-          >
-            Retiros
-          </Button>
-        </Zoom>
-
-        <Zoom in={true} timeout={1000}>
-          <Button
-            sx={{
-              backgroundColor: "#2C5282", // Azul oscuro
-              color: "#fff",
-              fontWeight: "bold",
-              textTransform: "none",
-              width: "120px",
-              height: "120px",
-              borderRadius: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.3)",
-              "&:hover": {
-                backgroundColor: "#2B6CB0",
-              },
-              transition:
-                "transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
-              padding: "0",
-              minWidth: "auto",
-              animation: "float 2s ease-in-out infinite",
-            }}
-            onClick={navigateToRegisterWithdrawals}
-          >
-            Registro de Retiros
-          </Button>
-        </Zoom>
+        {/* Botones */}
+        {[
+          {
+            color: " #34495e ",
+            hover: "#2D3748",
+            path: "/vista-producto",
+            label: "Listado de materiales",
+            delay: 500,
+          },
+          {
+            color: " #2e4053 ",
+            hover: "#4A5568",
+            path: "/vista-trabajador",
+            label: "Listado de trabajadores",
+            delay: 600,
+          },
+          {
+            color: " #2c3e50 ",
+            hover: "#319795",
+            path: "/vista-retiros",
+            label: "Listado de retiros",
+            delay: 900,
+          },
+          {
+            color: " #212f3d ",
+            hover: "#3182CE",
+            path: "/registro-trabajador",
+            label: "Registro de trabajadores",
+            delay: 700,
+          },
+          {
+            color: " #212f3c ",
+            hover: "#2D3748",
+            path: "/registro-producto",
+            label: "Registro de material",
+            delay: 800,
+          },
+          {
+            color: " #1b2631 ",
+            hover: "#2B6CB0",
+            path: "/registro-retiro",
+            label: "Registro de retiros",
+            delay: 1000,
+          },
+        ].map(({ color, hover, path, label, delay }, index) => (
+          <Zoom key={index} in={true} timeout={delay}>
+            <Button
+              sx={{
+                ...buttonStyles,
+                backgroundColor: color, // Color del botón
+                "&:hover": {
+                  backgroundColor: hover, // Hover del botón
+                },
+              }}
+              onClick={() => navigateTo(path)}
+            >
+              {label}
+            </Button>
+          </Zoom>
+        ))}
       </div>
 
       <style jsx>{`

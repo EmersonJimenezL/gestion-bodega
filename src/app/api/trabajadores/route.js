@@ -34,7 +34,7 @@ export async function POST(request) {
       cargo,
     } = await request.json();
 
-    // Validar que todos los campos estén presentes
+    // Validación de datos
     if (
       !rut ||
       !nombre ||
@@ -49,41 +49,37 @@ export async function POST(request) {
       );
     }
 
-    // Validar que el RUT tenga el formato correcto
+    // Validación del formato del RUT
     const rutRegex = /^[0-9]{7,8}-[0-9Kk]{1}$/;
-    if (!rutRegex.test(rut)) {
+    if (!rutRegex.test(rut.trim())) {
       return NextResponse.json(
         { message: "RUT no válido. El formato debe ser 12345678-9." },
         { status: 400 }
       );
     }
 
-    // Verificar si ya existe un empleado con el mismo RUT
-    const [existingEmployee] = await pool.query(
-      "SELECT * FROM EMPLEADOS WHERE rut = ?",
-      [rut]
-    );
+    // Verificación de duplicados
+    const [rows] = await pool.query("SELECT rut FROM EMPLEADOS WHERE rut = ?", [
+      rut,
+    ]);
 
-    if (existingEmployee.length > 0) {
+    // Aseguramos que rows es un array válido
+    if (Array.isArray(rows) && rows.length > 0) {
       return NextResponse.json(
         { message: "El RUT ya está registrado." },
         { status: 409 }
       );
     }
 
-    // Insertar el nuevo empleado
-    const [results] = await pool.query("INSERT INTO EMPLEADOS SET ?", {
-      rut,
-      nombre,
-      apellido_paterno,
-      apellido_materno,
-      area_trabajo,
-      cargo,
-    });
+    // Inserción de datos
+    const [insertResults] = await pool.query(
+      "INSERT INTO EMPLEADOS (rut, nombre, apellido_paterno, apellido_materno, area_trabajo, cargo) VALUES (?, ?, ?, ?, ?, ?)",
+      [rut, nombre, apellido_paterno, apellido_materno, area_trabajo, cargo]
+    );
 
-    // Retornar los datos del nuevo empleado
+    // Confirmación de éxito en la inserción
     return NextResponse.json({
-      id: results.insertId,
+      id: insertResults.insertId,
       rut,
       nombre,
       apellido_paterno,
